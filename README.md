@@ -1,6 +1,6 @@
 # Individual Project | AI 231
 
-Student: Michael Quinto
+Students: Joshua Cantor, Ely Pates, Michael Quinto
 Instructor: Dr. Miguel Remolona
 
 # Medical Image Classification
