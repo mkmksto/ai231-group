@@ -1,13 +1,34 @@
 import base64
+import os
+import sys
+from io import BytesIO
+from pathlib import Path
 from typing import Dict, Union
+
+from numpy import ndarray
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+
 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
+from PIL import Image
 from pydantic import BaseModel
+
+from training.inference_engine.tensor_rt_inference import BrainTumorClassifier
 
 
 class TestRequest(BaseModel):
     test2: str
+
+
+model = BrainTumorClassifier("./brain_tumor.engine")
+
+root_dir = Path(__file__).parent.parent.parent
+print("root_dir: ", root_dir)
+sample_test_image = "training/brain_tumor_dataset/Testing/glioma_tumor/image(1).jpg"
+image_path = Path(root_dir / sample_test_image)
+image = Image.open(image_path).convert("RGB")
 
 
 app = FastAPI(
@@ -36,15 +57,37 @@ async def predict_tumor_class(
     file: UploadFile = File(...),
 ):
     try:
-        contents = await file.read()
-        image_base64 = base64.b64encode(contents).decode("utf-8")
+        # Note: We won't use the base64 image for now, just the pillow image
+        # contents = await file.read()
+        # image_base64 = base64.b64encode(contents).decode("utf-8")
 
-        # TODO: In the future, this base64 image will be sent to the ML model
-        # For now, we'll return mock predictions
+        contents = await file.read()
+        image_from_frontend = Image.open(BytesIO(contents)).convert("RGB")
+
+        # # foor dummy data image
+        # print("image: ", image.size)
+        # print("image: ", image.format)
+        # print("image: ", image)
+
+        output: ndarray = model.inference(image_from_frontend)
+        print("output: ", output)
+
+        predicted_class_number = output.argmax().item()
+        print(predicted_class_number)  # Output: 1
+
+        # Mapping to label (optional):
+        class_mapping = {
+            0: "glioma_tumor",
+            1: "meningioma_tumor",
+            2: "no_tumor",
+            3: "pituitary_tumor",
+        }
+
+        predicted_class = class_mapping[predicted_class_number]
 
         return JSONResponse(
             {
-                "prediction": "glioma_tumor",  # Mock prediction
+                "prediction": predicted_class,
                 "confidence": 0.95,  # Mock confidence score
             }
         )
