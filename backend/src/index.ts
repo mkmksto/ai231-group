@@ -21,19 +21,18 @@ server.post("/api/predict", async (request, reply) => {
       return reply.status(400).send({ error: "No file uploaded" });
     }
 
-    // Here you can access the file data
+    // Convert file to base64
     const buffer = await data.toBuffer();
-    const filename = data.filename;
-    const mimetype = data.mimetype;
+    const base64Image = buffer.toString("base64");
 
-    // TODO: Process the image buffer here
-    // For now, just return a success message
-    return {
-      message: "File received successfully",
-      filename,
-      mimetype,
-      size: buffer.length,
+    // TODO: Send base64Image to ML model
+    // here, we either
+    const modelResponse = {
+      predicted_class: 1, // Replace with actual model prediction
+      confidence: 0.95, // Replace with actual confidence score
     };
+
+    return modelResponse;
   } catch (error) {
     console.error("Error processing file:", error);
     return reply.status(500).send({ error: "Error processing file" });
