@@ -1,4 +1,4 @@
-# Individual Project | AI 231
+# Backend
 
 Students: Joshua Cantor, Ely Pates, Michael Quinto
 Instructor: Dr. Miguel Remolona
