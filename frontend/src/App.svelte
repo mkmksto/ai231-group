@@ -2,6 +2,7 @@
   // We'll add imports and logic here later
   import ImageUploader from './lib/ImageUploader.svelte';
   import PredictionResult from './lib/PredictionResult.svelte';
+  import { sleep } from './utils/utils';
 
   // State variables to hold the prediction results
   let currentPrediction: string | null = null; // 'loading', 'error', or tumor type like 'glioma_tumor'
@@ -38,6 +39,8 @@
         method: 'POST',
         body: formData,
       });
+
+      await sleep(1500);
 
       if (!response.ok) {
         // Handle HTTP errors (e.g., 4xx, 5xx)

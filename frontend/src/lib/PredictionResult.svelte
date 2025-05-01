@@ -1,4 +1,6 @@
 <script lang="ts">
+  import WojakLoading from '../assets/wojak-loading-wojak.gif';
+
   // 'export let' defines a prop that can be passed to this component
   export let prediction: string | null = null; // e.g., 'glioma_tumor', 'no_tumor', 'loading', 'error'
   export let confidence: number | null = null; // e.g., 0.95
@@ -28,15 +30,25 @@
 </script>
 
 <div class="result-container">
-  <p class="message {messageClass}">
-    {displayMessage}
-  </p>
+  {#if prediction === 'loading'}
+    <img src={WojakLoading} alt="Loading..." class="loading-gif" style="width: 200px;" />
+  {:else}
+    <p class="message {messageClass}">
+      {displayMessage}
+    </p>
+  {/if}
 </div>
 
 <style>
   .result-container {
     text-align: center;
     padding: 1rem 0;
+  }
+
+  .loading-gif {
+    width: 100px;
+    height: auto;
+    margin: 1rem auto;
   }
 
   .message {
