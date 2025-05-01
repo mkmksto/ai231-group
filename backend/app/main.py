@@ -32,7 +32,20 @@ sample_test_image = "training/brain_tumor_dataset/Testing/glioma_tumor/image(1).
 image_path = Path(root_dir / sample_test_image)
 image = Image.open(image_path).convert("RGB")
 
-model_location = Path(root_dir / "training/inference_engine/brain_tumor_linux.engine")
+# OS-specific engine paths
+linux_engine = "training/inference_engine/brain_tumor_linux.engine"
+windows_engine = "training/inference_engine/brain_tumor.engine"
+
+# Select engine based on OS
+if sys.platform.startswith("linux"):
+    engine_path = linux_engine
+elif sys.platform.startswith("win"):
+    engine_path = windows_engine
+else:
+    raise OSError("Unsupported operating system. Only Linux and Windows are supported.")
+
+model_location = Path(root_dir / engine_path)
+print(f"Using engine: {model_location}")
 print(model_location.exists())
 print(model_location.absolute())
 model = BrainTumorClassifier(model_location)
