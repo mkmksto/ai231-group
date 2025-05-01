@@ -5,6 +5,8 @@ from io import BytesIO
 from pathlib import Path
 from typing import Dict, Union
 
+import torch
+import torch.nn.functional as F
 from numpy import ndarray
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -76,6 +78,12 @@ async def predict_tumor_class(
 
         output: ndarray = model.inference(image_from_frontend)
         print("output: ", output)
+        print("output dimensions: ", output.shape)
+
+        # Apply softmax to get probabilities
+        probabilities = torch.nn.functional.softmax(torch.from_numpy(output), dim=1)
+        confidence = probabilities.max().item()
+        print("confidence: ", confidence)
 
         predicted_class_number = output.argmax().item()
         print(predicted_class_number)  # Output: 1
@@ -94,7 +102,7 @@ async def predict_tumor_class(
         return JSONResponse(
             {
                 "prediction": predicted_class,
-                "confidence": 0.95,  # Mock confidence score
+                "confidence": confidence,  # Actual confidence score from model
             }
         )
 
