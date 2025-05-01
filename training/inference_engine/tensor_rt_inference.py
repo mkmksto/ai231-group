@@ -1,25 +1,30 @@
-import numpy as np
-import tensorrt as trt
-import pycuda.driver as cuda
-import pycuda.autoinit
-import time
-import cv2
+import os
 import sys
-sys.path.append("..")
+import time
+
+import cv2
+import numpy as np
+import pycuda.autoinit
+import pycuda.driver as cuda
+import tensorrt as trt
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from modules.transforms import val_transform
 
+
 class BrainTumorClassifier:
-    def __init__(self, engine_path, device='cuda'):
+    def __init__(self, engine_path, device="cuda"):
         self.logger = trt.Logger(trt.Logger.WARNING)
         self.engine = self._load_engine(engine_path)
+        print("self.engine", self.engine)
         self.context = self.engine.create_execution_context()
         self.transform = val_transform()
         self.device = device
 
         # Get input/output tensor names
         tensor_names = self._get_tensor_names()
-        self.input_name = tensor_names['input']
-        self.output_name = tensor_names['output']
+        self.input_name = tensor_names["input"]
+        self.output_name = tensor_names["output"]
 
         # Now you can safely get their shapes
         self.input_shape = tuple(self.engine.get_tensor_shape(self.input_name))
@@ -33,8 +38,12 @@ class BrainTumorClassifier:
 
         # Binding addresses list
         self.bindings = [None] * self.engine.num_io_tensors
-        self.bindings[self.engine.get_tensor_location(self.input_name)] = int(self.d_input)
-        self.bindings[self.engine.get_tensor_location(self.output_name)] = int(self.d_output)
+        self.bindings[self.engine.get_tensor_location(self.input_name)] = int(
+            self.d_input
+        )
+        self.bindings[self.engine.get_tensor_location(self.output_name)] = int(
+            self.d_output
+        )
 
         # CUDA stream
         self.stream = cuda.Stream()
@@ -49,13 +58,12 @@ class BrainTumorClassifier:
             name = self.engine.get_tensor_name(i)
             mode = self.engine.get_tensor_mode(name)
             if mode == trt.TensorIOMode.INPUT:
-                names['input'] = name
+                names["input"] = name
             elif mode == trt.TensorIOMode.OUTPUT:
-                names['output'] = name
-        if 'input' not in names or 'output' not in names:
+                names["output"] = name
+        if "input" not in names or "output" not in names:
             raise RuntimeError("Could not find valid input/output tensor names.")
         return names
-
 
     def _prepare_input(self, image):
         input_tensor = self.transform(image).unsqueeze(0).numpy()
@@ -91,4 +99,3 @@ class BrainTumorClassifier:
 
         print(f"Inference Time (GPU): {start_event.time_till(end_event):.3f} ms")
         return self.h_output
-
