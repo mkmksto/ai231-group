@@ -22,13 +22,18 @@ class TestRequest(BaseModel):
     test2: str
 
 
-model = BrainTumorClassifier("./brain_tumor.engine")
+# model = BrainTumorClassifier("./brain_tumor.engine")
 
 root_dir = Path(__file__).parent.parent.parent
 print("root_dir: ", root_dir)
 sample_test_image = "training/brain_tumor_dataset/Testing/glioma_tumor/image(1).jpg"
 image_path = Path(root_dir / sample_test_image)
 image = Image.open(image_path).convert("RGB")
+
+model_location = Path(root_dir / "training/inference_engine/brain_tumor_linux.engine")
+print(model_location.exists())
+print(model_location.absolute())
+model = BrainTumorClassifier(model_location)
 
 
 app = FastAPI(
@@ -84,6 +89,7 @@ async def predict_tumor_class(
         }
 
         predicted_class = class_mapping[predicted_class_number]
+        print("predicted_class", predicted_class)
 
         return JSONResponse(
             {
