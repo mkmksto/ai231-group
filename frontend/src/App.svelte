@@ -1,158 +1,212 @@
 <script lang="ts">
-  // We'll add imports and logic here later
-  import ImageUploader from './lib/ImageUploader.svelte';
-  import PredictionResult from './lib/PredictionResult.svelte';
-  import { sleep } from './utils/utils';
+  import { onMount, onDestroy } from 'svelte';
+  import NavBar from './lib/NavBar.svelte';
+  import DashboardSection from './lib/DashboardSection.svelte';
+  import CredentialCard from './lib/CredentialCard.svelte';
+  import BrainTumorSection from './lib/BrainTumorSection.svelte';
+  import { Brain, Heartbeat, Stethoscope, Virus, Eye, Bandaids, Dna, Bone } from 'phosphor-svelte'; // Icons for sections
+  import AnimatedBackground from './lib/AnimatedBackground.svelte'; // <-- Import background
 
-  // State variables to hold the prediction results
-  let currentPrediction: string | null = null; // 'loading', 'error', or tumor type like 'glioma_tumor'
-  let currentConfidence: number | null = null;
-  let currentError: string | null = null;
+  // --- Navigation --- 
+  const navItems = [
+    { name: "Brain Tumor Classifier", id: "brain-neuro", icon: Brain }, // Renamed for clarity
+    { name: "Cancer Diagnostics", id: "cancer", icon: Bandaids },
+    { name: "Cardiology AI", id: "cardio", icon: Heartbeat },
+    { name: "Respiratory Analysis", id: "respiratory", icon: Stethoscope },
+    { name: "Ophthalmology Insights", id: "ophthalmology", icon: Eye },
+    { name: "Gastroenterology Tools", id: "gastro", icon: Bandaids },
+    { name: "Infectious Disease AI", id: "infectious", icon: Virus },
+    { name: "Genetic Sequencing AI", id: "genetic", icon: Dna },
+    { name: "Radiology Assistant", id: "radiology", icon: Bone },
+  ];
 
-  async function handleUpload(file: File | null) {
-    if (!file) {
-      // Reset state if the file is deselected
-      currentPrediction = null;
-      currentConfidence = null;
-      currentError = null;
-      return;
+  let activeSection: string | null = navItems[0].id; // Default to first section
+
+  // --- User State (Simplified for Demo) ---
+  // In a real app, this would come from auth state management
+  interface User {
+    name: string;
+    email: string;
+    credentials?: string; // Optional for login display
+  }
+
+  let currentUser: User | null = { name: "Dr. Michael Quinto", email: "mquinto@diagnostech.ai", credentials: "MD, NeuroAI Specialist" }; // Example logged-in user
+
+  function handleLogout() {
+    currentUser = null; // Set user to null on logout
+    // TODO: Add actual logout logic (clear tokens, redirect, etc.)
+    alert("Logged out (simulated).");
+  }
+
+  // Placeholder function to handle login attempt
+  function handleLogin(event: CustomEvent<{ email: string; pass: string }>) {
+    const { email, pass } = event.detail;
+    console.log(`Simulating login for: ${email}`);
+    // TODO: Replace with actual API call to backend for authentication
+    // For demo: Log in anyone who tries
+    if (email && pass) {
+      currentUser = {
+        name: "Demo User", // Replace with name from backend
+        email: email,
+        credentials: "Demo Credentials" // Replace with credentials from backend if available
+      };
+      alert(`Logged in as ${currentUser.name} (simulated).`);
+    } else {
+      alert("Login failed (simulated - need email/password).");
     }
+  }
 
-    // Set state to loading
-    currentPrediction = 'loading';
-    currentConfidence = null;
-    currentError = null;
+  // Placeholder function to handle registration attempt
+  function handleRegister(event: CustomEvent<{ name: string; email: string; pass: string; credentials?: string }>) {
+    const { name, email, pass, credentials } = event.detail;
+    console.log(`Simulating registration for: ${name} <${email}>`);
+    // TODO: Replace with actual API call to backend for registration
+    // For demo: Register and log in the user immediately
+    if (name && email && pass) {
+      currentUser = { name, email, credentials };
+      alert(`Registered and logged in as ${currentUser.name} (simulated).`);
+    } else {
+      alert("Registration failed (simulated - need name/email/password).");
+    }
+  }
 
-    const formData = new FormData();
-    formData.append('file', file); // The backend should expect a file field named 'file'
-
-    try {
-      // NOTE: If your backend runs on a different port (e.g., 8000), you'll need to configure
-      // a proxy in vite.config.ts to avoid CORS issues during development.
-      // Example vite.config.ts addition:
-      // server: {
-      //   proxy: {
-      //     '/api': 'http://localhost:8000', // Adjust port if needed
-      //   },
-      // },
-      const response = await fetch('/api/predict', {
-        method: 'POST',
-        body: formData,
-      });
-
-      await sleep(1500);
-
-      if (!response.ok) {
-        // Handle HTTP errors (e.g., 4xx, 5xx)
-        let errorMsg = `HTTP error! Status: ${response.status}`;
-        try {
-          const errorData = await response.json();
-          errorMsg = errorData.detail || errorMsg; // Try to get specific error from backend
-        } catch (e) { /* Ignore if error response isn't JSON */ }
-        throw new Error(errorMsg);
-      }
-
-      // Assuming backend returns { prediction: 'some_tumor', confidence: 0.95 }
-      const result = await response.json();
-
-      // Update state with successful prediction
-      currentPrediction = result.prediction;
-      currentConfidence = result.confidence;
-      currentError = null;
-
-    } catch (err: any) {
-      // Handle network errors or errors thrown above
-      console.error('Upload failed:', err);
-      currentPrediction = 'error';
-      currentConfidence = null;
-      currentError = err.message || 'Failed to fetch prediction.';
+  // --- Navigation Handler ---
+  function handleNavClick(event: CustomEvent<string>) {
+    activeSection = event.detail; // Update active section based on NavBar click
+    // Optional: Scroll to top of content area when nav changes
+    const contentArea = document.querySelector('.dashboard-content');
+    if (contentArea) {
+      // Use a small timeout to ensure the content is rendered before scrolling
+      setTimeout(() => { 
+        contentArea.scrollTo({ top: 0, behavior: 'auto' }); 
+      }, 0);
     }
   }
 
 </script>
 
-<main>
-  <div class="title-container">
-    <img src="/brain-logo.png" alt="Brain Logo" class="brain-logo" />
-    <h1>Brain Tumor Classifier</h1>
-  </div>
+<div class="app-container">
+  <AnimatedBackground /> <!-- <-- Render background component -->
+  <h1 class="app-title">DiagnosTech-AI</h1> 
+  <NavBar {navItems} {activeSection} on:navclick={handleNavClick} /> 
 
-  <section class="upload-section">
-    <h2>Upload Brain Scan Image</h2>
-    <!-- Pass the upload handling function to ImageUploader -->
-    <ImageUploader onUpload={handleUpload} />
-    <!-- <p>[Image Upload Placeholder]</p> -->
-  </section>
+  <main class="dashboard-content">
+    <!-- Render only the active section -->
+    {#each navItems as item (item.id)}
+      {#if activeSection === item.id}
+        <DashboardSection title={item.name} sectionId={item.id} icon={item.icon}>
+          <!-- Slot content for each section -->
+          {#if item.id === 'brain-neuro'}
+            <!-- Embed the brain tumor classifier here -->
+            <BrainTumorSection />
+          {:else}
+            <!-- Placeholder content for other sections -->
+            <div class="placeholder-content">
+              <p>AI applications for <strong>{item.name}</strong> will be displayed here.</p>
+              <p><em>(Content under development)</em></p>
+              <!-- Example of potential card structure 
+              <div class="ai-use-case-card">
+                <h4>Condition Detection Example</h4>
+                <p>Using AI to analyze {item.name.toLowerCase().includes('radiology') ? 'images' : 'data'} for early detection of [Specific Condition].</p>
+              </div>
+              -->
+            </div>
+          {/if}
+        </DashboardSection>
+      {/if} 
+    {/each}
+  </main>
 
-  <section class="results-section">
-    <h2>Prediction Results</h2>
-    <PredictionResult
-      prediction={currentPrediction}
-      confidence={currentConfidence}
-      error={currentError}
-    />
-    <!-- <p>[Results Placeholder]</p> -->
-  </section>
-
-</main>
+  <CredentialCard 
+    user={currentUser} 
+    on:logout={handleLogout}
+    on:login={handleLogin} 
+    on:register={handleRegister}
+  />
+</div>
 
 <style>
-  /* Make body background dark to match screenshot */
+  /* --- Global Styles / Resets --- */
   :global(body) {
-    background-color: #333;
-    color: #eee; /* Adjust default text color for contrast */
     margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern sans-serif */
+    color: #333;
+    overflow-x: hidden; /* Prevent horizontal scrollbars potentially caused by fixed elements */
+    min-height: 100vh; 
+    /* Background is now handled by the AnimatedBackground component */
   }
 
-  main {
+  :global(h1, h2, h3, h4, h5, h6) {
+    font-family: 'Roboto', sans-serif; /* Optional: Different font for headers */
+    color: #1A237E; /* Dark indigo */
+  }
+
+  .app-title {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    padding: 0.5rem 0;
+    font-size: 1.5rem; /* Adjust size as needed */
+    color: #007AFF; /* Match navbar blue */
+    width: 100%;
+    text-align: center;
+    background-color: rgba(10, 25, 47, 0.85); /* Dark blue semi-transparent */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 1300; /* Highest z-index */
+    font-weight: 600;
+    color: #ccd6f6; /* Lighter text color for dark bg */
+  }
+
+  .app-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 2rem;
-    max-width: 800px;
+    position: relative; /* Ensure z-index stacking context */
+  }
+
+  .dashboard-content {
+    padding-top: 100px; 
+    padding-bottom: 100px;
+    max-width: 1100px;
     margin: 0 auto;
-    font-family: sans-serif;
-  }
-
-  .title-container {
-    display: flex;
-    align-items: center;
-    gap: 1rem; /* Space between logo and title */
-    margin-bottom: 2rem;
-  }
-
-  .brain-logo {
-    height: 4em; /* Adjust size as needed */
-    width: auto;
-  }
-
-  h1 {
-    color: #eee; /* Lighter color for dark background */
-    margin-bottom: 0; /* Remove bottom margin as it's handled by title-container */
-    font-size: 2.5em; /* Make title a bit larger */
-    text-align: center;
-  }
-
-  section {
+    padding-left: 1rem;
+    padding-right: 1rem;
     width: 100%;
-    border: 1px solid #555; /* Darker border */
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    color: #333; /* Text inside sections should be dark */
+    box-sizing: border-box;
+    overflow-y: auto;
+    height: calc(100vh - 100px - 100px); /* Adjust if CredentialCard height changes */
+    position: relative; /* Ensure content stays above background */
+    z-index: 10;
   }
 
-  h2 {
-    margin-top: 0;
-    color: #555;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
+  .placeholder-content {
+    padding: 2rem;
     text-align: center;
+    background-color: #f5f7fa;
+    border-radius: 6px;
+    border: 1px dashed #ccc;
+    color: #6c757d;
   }
 
-  /* p { Removed unused selector */
-  /*   color: #666; */
-  /* } */
+  .placeholder-content p {
+      margin-bottom: 0.5rem;
+  }
+
+   /* Basic styling for potential AI use case cards */
+   .ai-use-case-card {
+      background-color: white;
+      padding: 1rem;
+      border-radius: 6px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      margin-top: 1rem;
+      border-left: 4px solid #007AFF;
+      text-align: left;
+   }
+    .ai-use-case-card h4 {
+        margin-top: 0;
+        color: #0056b3;
+    }
+
 </style>
