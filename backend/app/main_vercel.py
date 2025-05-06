@@ -75,10 +75,15 @@ backend_dist_path = root_dir / "backend/dist"
 #     name="assets",
 # )
 
+BACKEND_PATH = Path(__file__).parent.parent
+BACKEND_DIST_PATH = BACKEND_PATH / "dist"
+print(f"BACKEND_PATH: {BACKEND_PATH}")
+print(f"BACKEND_DIST_PATH: {BACKEND_DIST_PATH.resolve()}")
+
 app.mount(
     "/assets",
     # StaticFiles(directory=str(backend_dist_path / "assets")),
-    StaticFiles(directory="./dist/assets"),
+    StaticFiles(directory=str((BACKEND_DIST_PATH / "assets").resolve())),
     name="assets",
 )
 
@@ -141,4 +146,8 @@ async def health_check() -> Dict[str, str]:
 # )
 
 
-app.mount("/", StaticFiles(directory=str(backend_dist_path), html=True), name="backend")
+app.mount(
+    "/",
+    StaticFiles(directory=str(BACKEND_DIST_PATH), html=True),
+    name="backend",
+)
