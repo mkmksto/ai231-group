@@ -1,3 +1,6 @@
+# For vercel idk so that it prioritizes the requirements file???
+pyproject.toml
+
 # ------ Frontend gitignore files
 # Logs
 logs
