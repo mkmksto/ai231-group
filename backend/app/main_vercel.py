@@ -12,10 +12,15 @@ from numpy import ndarray
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
+from app.utils import BACKEND_DIST_PATH
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from PIL import Image
 from pydantic import BaseModel
+
+#
+# ----
+#
 
 root_dir = Path(__file__).parent.parent.parent
 # sample_test_image = "training/brain_tumor_dataset/Testing/glioma_tumor/image(1).jpg"
@@ -63,26 +68,9 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# serve vite static files
-frontend_dist_path = root_dir / "frontend/dist"
-backend_dist_path = root_dir / "backend/dist"
-
-
-# # # Mount static files first (more specific routes)
-# app.mount(
-#     "/assets",
-#     StaticFiles(directory=str(frontend_dist_path / "assets")),
-#     name="assets",
-# )
-
-BACKEND_PATH = Path(__file__).parent.parent
-BACKEND_DIST_PATH = BACKEND_PATH / "dist"
-print(f"BACKEND_PATH: {BACKEND_PATH}")
-print(f"BACKEND_DIST_PATH: {BACKEND_DIST_PATH.resolve()}")
 
 app.mount(
     "/assets",
-    # StaticFiles(directory=str(backend_dist_path / "assets")),
     StaticFiles(directory=str((BACKEND_DIST_PATH / "assets").resolve())),
     name="assets",
 )
@@ -138,12 +126,6 @@ async def predict_tumor_class(
 async def health_check() -> Dict[str, str]:
     """Health check endpoint"""
     return {"status": "healthy", "version": "1.0.0"}
-
-
-# # Mount the root directory last (less specific route)
-# app.mount(
-#     "/", StaticFiles(directory=str(frontend_dist_path), html=True), name="frontend"
-# )
 
 
 app.mount(

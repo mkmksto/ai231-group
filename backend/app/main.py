@@ -13,12 +13,17 @@ from numpy import ndarray
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
+from app.utils import BACKEND_DIST_PATH
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from PIL import Image
 from pydantic import BaseModel
 
 from training.inference_engine.tensor_rt_inference import BrainTumorClassifier
+
+#
+# ----
+#
 
 root_dir = Path(__file__).parent.parent.parent
 print("root_dir: ", root_dir)
@@ -67,12 +72,11 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# serve vite static files
-frontend_dist_path = root_dir / "frontend/dist"
 
-# Mount static files first (more specific routes)
 app.mount(
-    "/assets", StaticFiles(directory=str(frontend_dist_path / "assets")), name="assets"
+    "/assets",
+    StaticFiles(directory=str((BACKEND_DIST_PATH / "assets").resolve())),
+    name="assets",
 )
 
 
@@ -127,7 +131,8 @@ async def health_check() -> Dict[str, str]:
     return {"status": "healthy", "version": "1.0.0"}
 
 
-# Mount the root directory last (less specific route)
 app.mount(
-    "/", StaticFiles(directory=str(frontend_dist_path), html=True), name="frontend"
+    "/",
+    StaticFiles(directory=str(BACKEND_DIST_PATH), html=True),
+    name="backend",
 )
