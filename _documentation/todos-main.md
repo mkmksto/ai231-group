@@ -8,6 +8,7 @@
 - gh actions for checking how many feedback images are already present
 
 - retraining is automatic but deployment of the model is manual
+- add auth middleware to non-auth routes
 
 Final:
 
