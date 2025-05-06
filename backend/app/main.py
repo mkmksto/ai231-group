@@ -251,6 +251,7 @@ async def me(request: Request):
     #     if is_at_valid and at_payload:
     #         print('valid access token and refresh token')
 
+    # see app/db.py for the user table schema
     return user
 
 
