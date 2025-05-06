@@ -18,9 +18,9 @@ from PIL import Image
 from pydantic import BaseModel
 
 root_dir = Path(__file__).parent.parent.parent
-sample_test_image = "training/brain_tumor_dataset/Testing/glioma_tumor/image(1).jpg"
-image_path = Path(root_dir / sample_test_image)
-image = Image.open(image_path).convert("RGB")
+# sample_test_image = "training/brain_tumor_dataset/Testing/glioma_tumor/image(1).jpg"
+# image_path = Path(root_dir / sample_test_image)
+# image = Image.open(image_path).convert("RGB")
 
 # OS-specific engine paths
 linux_engine = "training/inference_engine/brain_tumor_linux.engine"
@@ -79,7 +79,7 @@ async def predict_tumor_class(
     try:
 
         contents = await file.read()
-        image_from_frontend = Image.open(BytesIO(contents)).convert("RGB")
+        # image_from_frontend = Image.open(BytesIO(contents)).convert("RGB")
 
         # output: ndarray = model.inference(image_from_frontend)
 
