@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { User, IdentificationCard, SignOut, SignIn, UserPlus, Envelope, Lock, ShieldCheck } from 'phosphor-svelte';
+  import { Envelope, IdentificationCard, Lock, ShieldCheck, SignOut, User, UserPlus } from 'phosphor-svelte';
   import { createEventDispatcher } from 'svelte';
 
   // Define the User type matching App.svelte
@@ -26,15 +26,25 @@
   }
 
   function submitLogin() {
-      if (!email || !password) {
-          alert('Please enter email and password.');
-          return;
-      }
-      console.log('Dispatching login');
-      dispatch('login', { email: email, pass: password });
-      // Clear form after attempt
-      email = '';
-      password = '';
+    // this sends a request to the backend which initiates the google oauth flow
+    // the user is redirected to the google login page
+
+    // if successful, the user is redirected back to the frontend
+    console.log("handleContinueWithGoogle");
+    setTimeout(() => {
+      window.location.href = "/api/auth/google/login";
+    }, 100);
+
+
+    // // if (!email || !password) {
+    // //     alert('Please enter email and password.');
+    // //     return;
+    // // }
+    // console.log('Dispatching login');
+    // // dispatch('login', { email: email, pass: password });
+    // // Clear form after attempt
+    // email = '';
+    // password = '';
   }
 
   function submitRegister() {
@@ -113,7 +123,7 @@
     {:else}
       <!-- LOGIN FORM -->
       <form class="auth-form" on:submit|preventDefault={submitLogin}>
-        <h4><SignIn size={20} /> Login to Your Account</h4>
+        <!-- <h4><SignIn size={20} /> Login to Your Account</h4>
          <div class="form-group">
             <Envelope size={16} /><label for="login-email">Email:</label>
             <input type="email" id="login-email" bind:value={email} required placeholder="your@email.com"/>
@@ -121,10 +131,10 @@
         <div class="form-group">
             <Lock size={16} /><label for="login-password">Password:</label>
             <input type="password" id="login-password" bind:value={password} required placeholder="********"/>
-        </div>
+        </div> -->
          <div class="form-actions">
-          <button type="submit" class="submit-button login">Login</button>
-          <button type="button" on:click={toggleMode} class="toggle-button">Create Account</button>
+          <button type="submit" class="submit-button login">Continue with Google</button>
+          <!-- <button type="button" on:click={toggleMode} class="toggle-button">Create Account</button> -->
         </div>
       </form>
     {/if}
