@@ -7,11 +7,11 @@ from typing import Dict, Union
 
 import torch
 import torch.nn.functional as F
+from dotenv import load_dotenv
 from fastapi.staticfiles import StaticFiles
 from numpy import ndarray
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-
 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
@@ -19,13 +19,6 @@ from PIL import Image
 from pydantic import BaseModel
 
 from training.inference_engine.tensor_rt_inference import BrainTumorClassifier
-
-
-class TestRequest(BaseModel):
-    test2: str
-
-
-# model = BrainTumorClassifier("./brain_tumor.engine")
 
 root_dir = Path(__file__).parent.parent.parent
 print("root_dir: ", root_dir)
@@ -67,36 +60,14 @@ app.mount(
 )
 
 
-# @app.get("/")
-# async def root() -> Dict[str, str]:
-#     """Root endpoint returning API status"""
-#     return {"status": "online", "message": "Medical Image Classification API"}
-
-
-@app.post("/test")
-async def test(test2: TestRequest):
-    """sample endpoint with a request body"""
-    print("hello from /test")
-    print("test2: ", test2)
-    return test2
-
-
 @app.post("/api/predict")
 async def predict_tumor_class(
     file: UploadFile = File(...),
 ):
     try:
-        # Note: We won't use the base64 image for now, just the pillow image
-        # contents = await file.read()
-        # image_base64 = base64.b64encode(contents).decode("utf-8")
 
         contents = await file.read()
         image_from_frontend = Image.open(BytesIO(contents)).convert("RGB")
-
-        # # foor dummy data image
-        # print("image: ", image.size)
-        # print("image: ", image.format)
-        # print("image: ", image)
 
         output: ndarray = model.inference(image_from_frontend)
         print("output: ", output)
