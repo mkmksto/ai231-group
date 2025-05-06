@@ -60,15 +60,17 @@ app = FastAPI(
 
 # serve vite static files
 frontend_dist_path = root_dir / "frontend/dist"
+
+# Mount static files first (more specific routes)
 app.mount(
-    "/", StaticFiles(directory=str(frontend_dist_path), html=True), name="frontend"
+    "/assets", StaticFiles(directory=str(frontend_dist_path / "assets")), name="assets"
 )
 
 
-@app.get("/")
-async def root() -> Dict[str, str]:
-    """Root endpoint returning API status"""
-    return {"status": "online", "message": "Medical Image Classification API"}
+# @app.get("/")
+# async def root() -> Dict[str, str]:
+#     """Root endpoint returning API status"""
+#     return {"status": "online", "message": "Medical Image Classification API"}
 
 
 @app.post("/test")
@@ -136,3 +138,9 @@ async def predict_tumor_class(
 async def health_check() -> Dict[str, str]:
     """Health check endpoint"""
     return {"status": "healthy", "version": "1.0.0"}
+
+
+# Mount the root directory last (less specific route)
+app.mount(
+    "/", StaticFiles(directory=str(frontend_dist_path), html=True), name="frontend"
+)
