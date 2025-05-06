@@ -77,7 +77,8 @@ backend_dist_path = root_dir / "backend/dist"
 
 app.mount(
     "/assets",
-    StaticFiles(directory=str(backend_dist_path / "assets")),
+    # StaticFiles(directory=str(backend_dist_path / "assets")),
+    StaticFiles(directory="./dist/assets"),
     name="assets",
 )
 
