@@ -7,6 +7,7 @@ from typing import Dict, Union
 
 import torch
 import torch.nn.functional as F
+from fastapi.staticfiles import StaticFiles
 from numpy import ndarray
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -55,6 +56,12 @@ app = FastAPI(
     title="Medical Image Classification API",
     description="API for brain tumor image classification",
     version="1.0.0",
+)
+
+# serve vite static files
+frontend_dist_path = root_dir / "frontend/dist"
+app.mount(
+    "/", StaticFiles(directory=str(frontend_dist_path), html=True), name="frontend"
 )
 
 
