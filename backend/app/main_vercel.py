@@ -65,10 +65,18 @@ app = FastAPI(
 
 # serve vite static files
 frontend_dist_path = root_dir / "frontend/dist"
+backend_dist_path = root_dir / "backend/dist"
 
-# Mount static files first (more specific routes)
+
+# # Mount static files first (more specific routes)
+# app.mount(
+#     "/assets", StaticFiles(directory=str(frontend_dist_path / "assets")), name="assets"
+# )
+
 app.mount(
-    "/assets", StaticFiles(directory=str(frontend_dist_path / "assets")), name="assets"
+    "/assets",
+    StaticFiles(directory=str(backend_dist_path / "assets"), html=True),
+    name="assets",
 )
 
 
@@ -124,7 +132,10 @@ async def health_check() -> Dict[str, str]:
     return {"status": "healthy", "version": "1.0.0"}
 
 
-# Mount the root directory last (less specific route)
-app.mount(
-    "/", StaticFiles(directory=str(frontend_dist_path), html=True), name="frontend"
-)
+# # Mount the root directory last (less specific route)
+# app.mount(
+#     "/", StaticFiles(directory=str(frontend_dist_path), html=True), name="frontend"
+# )
+
+
+app.mount("/", StaticFiles(directory=str(backend_dist_path), html=True), name="backend")
