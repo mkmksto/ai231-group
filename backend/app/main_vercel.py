@@ -1,12 +1,11 @@
 import base64
 import os
+import random
 import sys
 from io import BytesIO
 from pathlib import Path
 from typing import Dict, Union
 
-import torch
-import torch.nn.functional as F
 from dotenv import load_dotenv
 from fastapi.staticfiles import StaticFiles
 from numpy import ndarray
@@ -18,10 +17,7 @@ from fastapi.responses import JSONResponse
 from PIL import Image
 from pydantic import BaseModel
 
-from training.inference_engine.tensor_rt_inference import BrainTumorClassifier
-
 root_dir = Path(__file__).parent.parent.parent
-print("root_dir: ", root_dir)
 sample_test_image = "training/brain_tumor_dataset/Testing/glioma_tumor/image(1).jpg"
 image_path = Path(root_dir / sample_test_image)
 image = Image.open(image_path).convert("RGB")
@@ -42,7 +38,7 @@ model_location = Path(root_dir / engine_path)
 print(f"Using engine: {model_location}")
 print(model_location.exists())
 print(model_location.absolute())
-model = BrainTumorClassifier(model_location)
+# model = BrainTumorClassifier(model_location)
 
 load_dotenv()
 
@@ -85,28 +81,25 @@ async def predict_tumor_class(
         contents = await file.read()
         image_from_frontend = Image.open(BytesIO(contents)).convert("RGB")
 
-        output: ndarray = model.inference(image_from_frontend)
-        print("output: ", output)
-        print("output dimensions: ", output.shape)
+        # output: ndarray = model.inference(image_from_frontend)
 
         # Apply softmax to get probabilities
-        probabilities = torch.nn.functional.softmax(torch.from_numpy(output), dim=1)
-        confidence = probabilities.max().item()
-        print("confidence: ", confidence)
+        # probabilities = torch.nn.functional.softmax(torch.from_numpy(output), dim=1)
+        # confidence = probabilities.max().item()
 
-        predicted_class_number = output.argmax().item()
-        print(predicted_class_number)  # Output: 1
+        # predicted_class_number = output.argmax().item()
 
-        # Mapping to label (optional):
+        # # Mapping to label (optional):
         class_mapping = {
             0: "glioma_tumor",
             1: "meningioma_tumor",
             2: "no_tumor",
             3: "pituitary_tumor",
         }
+        print(class_mapping)
 
-        predicted_class = class_mapping[predicted_class_number]
-        print("predicted_class", predicted_class)
+        predicted_class = random.choice(list(class_mapping.values()))
+        confidence = random.random()
 
         return JSONResponse(
             {
@@ -116,6 +109,10 @@ async def predict_tumor_class(
         )
 
     except Exception as e:
+        print(f"Error processing image: {str(e)}")
+        import traceback
+
+        traceback.print_exc()
         return JSONResponse(
             status_code=500, content={"detail": f"Error processing image: {str(e)}"}
         )
