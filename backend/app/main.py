@@ -161,7 +161,7 @@ async def callback(code: str):
     try:
         cursor = conn.cursor()
         # Find or create user
-        cursor.execute("SELECT * FROM users WHERE google_id = ?", (user_data["id"],))
+        cursor.execute("SELECT * FROM users WHERE google_id = %s", (user_data["id"],))
         user = cursor.fetchone()
 
         # Create user if they don't exist
@@ -170,7 +170,7 @@ async def callback(code: str):
             cursor.execute(
                 """
                 INSERT INTO users (name, email, google_id, created_at)
-                VALUES (?, ?, ?, ?)
+                VALUES (%s, %s, %s, %s)
                 """,
                 (
                     user_data["name"],
@@ -182,7 +182,7 @@ async def callback(code: str):
             conn.commit()
 
             cursor.execute(
-                "SELECT * FROM users WHERE google_id = ?", (user_data["id"],)
+                "SELECT * FROM users WHERE google_id = %s", (user_data["id"],)
             )
             user = cursor.fetchone()
 
@@ -242,7 +242,7 @@ async def me(request: Request):
     # Get user from db after validating access token
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE user_id = ?", (user.user_id,))
+    cursor.execute("SELECT * FROM users WHERE user_id = %s", (user.user_id,))
     user = cursor.fetchone()
     conn.close()
 

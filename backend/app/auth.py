@@ -119,9 +119,11 @@ def refresh_at_token(refresh_token: str):
         raise JWTError("Invalid refresh token")
 
     db_conn = get_db_connection()
-    db_user = db_conn.execute(
-        "SELECT * FROM users WHERE user_id = ?", (rt_payload.get("user_id"),)
-    ).fetchone()
+    cursor = db_conn.cursor()
+    cursor.execute(
+        "SELECT * FROM users WHERE user_id = %s", (rt_payload.get("user_id"),)
+    )
+    db_user = cursor.fetchone()
     if not db_user:
         raise JWTError("User not found")
 
