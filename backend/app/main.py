@@ -15,6 +15,7 @@ from PIL import Image
 from sqlalchemy.orm import Session
 
 from .auth import TokenOrDbUserPayload
+from .storage import upload_to_gcs
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
@@ -251,6 +252,17 @@ async def predict_tumor_class(
     try:
         contents = await file.read()
         image_from_frontend = Image.open(BytesIO(contents)).convert("RGB")
+        # Save the image temporarily
+        temp_path = f"/tmp/{file.filename}"
+        image_from_frontend.save(temp_path)
+
+        destination_blob_name = (
+            f"uploads/{datetime.now().strftime('%Y%m%d_%H%M%S')}_{file.filename}"
+        )
+        upload_to_gcs(
+            source_file_path=temp_path,
+            destination_blob_name=destination_blob_name,
+        )
 
         class_mapping = {
             0: "glioma_tumor",
