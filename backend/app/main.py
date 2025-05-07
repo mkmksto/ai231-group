@@ -162,7 +162,9 @@ async def callback(code: str, db: Session = Depends(get_db)):
     print("finding or creating user")
     try:
         # Find or create user
+        print("finding user")
         user = db.query(User).filter(User.google_id == user_data["id"]).first()
+        print("user: ", user)
 
         # Create user if they don't exist
         if not user:
