@@ -6,7 +6,6 @@ from io import BytesIO
 from pathlib import Path
 from typing import Dict
 
-from app.auth import TokenOrDbUserPayload
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, File, Request, UploadFile
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -15,18 +14,21 @@ from fastapi.staticfiles import StaticFiles
 from PIL import Image
 from sqlalchemy.orm import Session
 
+from .auth import TokenOrDbUserPayload
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 import requests
-from app.auth import (
+
+from .auth import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     REFRESH_TOKEN_EXPIRE_DAYS,
     create_access_token,
     create_refresh_token,
 )
-from app.db import User, get_db, init_db
-from app.middleware import AuthMiddleware
-from app.utils import BACKEND_DIST_PATH
+from .db import User, get_db, init_db
+from .middleware import AuthMiddleware
+from .utils import BACKEND_DIST_PATH
 
 # ML Imports
 # from numpy import ndarray

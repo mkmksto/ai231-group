@@ -2,11 +2,12 @@ from datetime import datetime, timedelta
 from os import getenv
 from typing import Optional
 
-from app.db import User, get_db
 from dotenv import load_dotenv
 from jose import JWTError, jwt
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+
+from .db import User, get_db
 
 load_dotenv()
 
