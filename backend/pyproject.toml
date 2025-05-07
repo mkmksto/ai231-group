@@ -10,7 +10,6 @@ dependencies = [
     "numpy>=2.2.5",
     # "opencv-python>=4.11.0.86",
     "pillow>=11.2.1",
-    "psycopg2>=2.9.10",
     "psycopg2-binary>=2.9.10",
     # "pycuda>=2025.1",
     "pydantic>=2.11.4",
