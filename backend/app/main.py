@@ -89,7 +89,15 @@ GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
 FRONTEND_BASE_URL = os.getenv("FRONTEND_BASE_URL")
-
+if any(
+    [
+        GOOGLE_CLIENT_ID is None,
+        GOOGLE_CLIENT_SECRET is None,
+        GOOGLE_REDIRECT_URI is None,
+        FRONTEND_BASE_URL is None,
+    ]
+):
+    raise ValueError("Missing environment variables")
 
 app = FastAPI(
     title="Medical Image Classification API",
