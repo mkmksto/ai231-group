@@ -130,8 +130,8 @@ async def logout():
             "message": "Logged out successfully",
         }
     )
-    response.delete_cookie("accessToken")
-    response.delete_cookie("refreshToken")
+    response.delete_cookie("access_token")
+    response.delete_cookie("refresh_token")
     return response
 
 
@@ -232,9 +232,9 @@ async def callback(code: str):
     # return RedirectResponse(FRONTEND_BASE_URL)
 
 
-@app.get("/api/auth/me")
+@app.get("/api/me")
 async def me(request: Request):
-    print(">> .... inside /api/auth/me")
+    print(">> .... inside /api/me")
     _user = request.state.user
     print("_user: ", _user)
     user = TokenOrDbUserPayload(**_user)

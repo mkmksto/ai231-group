@@ -82,7 +82,7 @@
     // then we conditionally render whether the person is logged in or not  based on the response
     // if no response / error, then we render the login page / footer
     // if with response, then we render their user info
-    const response = await fetch("/api/auth/me", {
+    const response = await fetch("/api/me", {
       method: "GET",
       credentials: "include",
     });

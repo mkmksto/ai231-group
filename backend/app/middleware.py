@@ -14,6 +14,9 @@ from starlette.middleware.base import BaseHTTPMiddleware
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         print(">>>> inside auth middleware ---------------------------- ")
+        if request.url.path.startswith("/api/auth"):
+            print("...inside auth middleware: auth endpoint, skipping auth check")
+            return await call_next(request)
 
         _access_token = request.cookies.get("access_token") or ""
         _refresh_token = request.cookies.get("refresh_token") or ""
@@ -58,6 +61,6 @@ class AuthMiddleware(BaseHTTPMiddleware):
                 return response
         else:
             print("rt is invalid")
-            # raise HTTPException(status_code=401, detail="Invalid refresh token")
-            response = await call_next(request)
-            return response
+            raise HTTPException(status_code=401, detail="Invalid refresh token")
+            # response = await call_next(request)
+            # return response
