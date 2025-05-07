@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from os import getenv
 
 from dotenv import load_dotenv
-from jose import jwt
+from jose import JWTError, jwt
 
 load_dotenv()
 
@@ -11,6 +11,12 @@ REFRESH_TOKEN_SECRET = getenv("REFRESH_TOKEN_SECRET")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
 REFRESH_TOKEN_EXPIRE_DAYS = 7
+
+if ACCESS_TOKEN_SECRET is None:
+    raise ValueError("ACCESS_TOKEN_SECRET is not set")
+
+if REFRESH_TOKEN_SECRET is None:
+    raise ValueError("REFRESH_TOKEN_SECRET is not set")
 
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
@@ -49,7 +55,7 @@ def get_at_payload(token: str):
             "is_at_expired": payload.get("exp") < datetime.utcnow().timestamp(),
             "payload": payload,
         }
-    except jwt.JWTError:
+    except JWTError:
         return invalid_at_response
 
 
@@ -73,5 +79,5 @@ def get_rt_payload(token: str):
             "is_rt_expired": payload.get("exp") < datetime.utcnow().timestamp(),
             "payload": payload,
         }
-    except jwt.JWTError:
+    except JWTError:
         return invalid_rt_response
