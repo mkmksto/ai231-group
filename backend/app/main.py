@@ -224,7 +224,7 @@ async def callback(code: str, db: Session = Depends(get_db)):
 async def me(request: Request, db: Session = Depends(get_db)):
     print(">> .... inside /api/me")
     _user = request.state.user
-    print("_user: ", _user)
+    print("_user name: ", _user["name"])
     user = TokenOrDbUserPayload(**_user)
 
     # Get user from db after validating access token
