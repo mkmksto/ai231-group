@@ -1,0 +1,10 @@
+training/brain_tumor_dataset
+training/brain_tumor_dataset/*
+training/brain_tumor_dataset/**/*
+training/training_data/**/*
+training/training_data/*
+training/training_data
+.onnx
+.engine
+training
+training/
