@@ -1,3 +1,6 @@
+import os
+
+from dotenv import load_dotenv
 from fastapi import HTTPException, Request
 from fastapi.responses import RedirectResponse
 from pydantic import ValidationError
@@ -11,13 +14,19 @@ from .auth import (
     refresh_at_token,
 )
 
+load_dotenv()
+FRONTEND_BASE_URL = os.getenv("FRONTEND_BASE_URL")
+
 
 # Custom middleware
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         print(">>>> inside auth middleware ---------------------------- ")
-        if request.url.path.startswith("/api/auth"):
-            print("...inside auth middleware: auth endpoint, skipping auth check")
+        allowed_paths = ["/api/auth", "/", "/assets", "/health"]
+
+        # Check if the request path starts with any of the allowed paths
+        if any(request.url.path.startswith(path) for path in allowed_paths):
+            print("...inside auth middleware: allowed endpoint, skipping auth check")
             return await call_next(request)
 
         _access_token = request.cookies.get("access_token") or ""
@@ -28,8 +37,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
             refresh_token = RawRefreshTokenCookie(refresh_token=_refresh_token)
         except ValidationError as e:
             print("RT might be empty or expired")
-            return RedirectResponse(url="/", status_code=302)
-            # raise HTTPException(status_code=401, detail=str(e))
+            # return RedirectResponse(url=FRONTEND_BASE_URL, status_code=302)
+            raise HTTPException(status_code=401, detail=str(e))
         print("both at and rt are strings")
         print("access token: ")
         print(access_token)
@@ -65,6 +74,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         else:
             print("rt is invalid")
             # Get the origin from the request headers
-            return RedirectResponse(url="/", status_code=302)
+            # return RedirectResponse(url=FRONTEND_BASE_URL, status_code=302)
+            raise HTTPException(status_code=401, detail="Invalid refresh token")
             # response = await call_next(request)
             # return response
