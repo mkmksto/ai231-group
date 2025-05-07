@@ -4,8 +4,9 @@ import sys
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import Dict, Union
+from typing import Dict
 
+from app.auth import TokenOrDbUserPayload
 from dotenv import load_dotenv
 from fastapi.staticfiles import StaticFiles
 
@@ -17,10 +18,9 @@ from app.auth import (
     REFRESH_TOKEN_EXPIRE_DAYS,
     create_access_token,
     create_refresh_token,
-    get_at_payload,
-    get_rt_payload,
 )
 from app.db import get_db_connection, init_db
+from app.middleware import AuthMiddleware
 from app.utils import BACKEND_DIST_PATH
 from fastapi import Depends, FastAPI, File, Request, UploadFile
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -104,6 +104,7 @@ app = FastAPI(
 
 init_db()
 
+app.add_middleware(AuthMiddleware)
 
 app.mount(
     "/assets",
@@ -122,8 +123,16 @@ async def login():
 
 @app.post("/api/auth/logout")
 async def logout():
-    # TODO: clear cookies
-    return {"message": "Logged out"}
+    response = JSONResponse(
+        content={
+            "success": True,
+            "redirect": f"{FRONTEND_BASE_URL}",
+            "message": "Logged out successfully",
+        }
+    )
+    response.delete_cookie("accessToken")
+    response.delete_cookie("refreshToken")
+    return response
 
 
 @app.get("/api/auth/google/callback")
@@ -225,33 +234,15 @@ async def callback(code: str):
 
 @app.get("/api/auth/me")
 async def me(request: Request):
-    # get the user from the cookies
-    access_token = request.cookies.get("access_token")
-    refresh_token = request.cookies.get("refresh_token")
-
-    if not access_token:
-        return JSONResponse(status_code=401, content={"message": "Unauthorized"})
-
-    at_payload: dict = get_at_payload(access_token)
-    rt_payload: dict = get_rt_payload(refresh_token)
-    is_at_valid, is_at_expired, at_payload = at_payload.values()
-    is_rt_valid, is_rt_expired, rt_payload = rt_payload.values()
-    print(
-        {
-            "is_at_valid": is_at_valid,
-            "is_at_expired": is_at_expired,
-            "is_rt_valid": is_rt_valid,
-        }
-    )
-
-    # TODO: implement refresh token logic using fastapi middleware
+    print(">> .... inside /api/auth/me")
+    _user = request.state.user
+    print("_user: ", _user)
+    user = TokenOrDbUserPayload(**_user)
 
     # Get user from db after validating access token
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute(
-        "SELECT * FROM users WHERE google_id = ?", (at_payload["google_id"],)
-    )
+    cursor.execute("SELECT * FROM users WHERE user_id = ?", (user.user_id,))
     user = cursor.fetchone()
     conn.close()
 
@@ -261,7 +252,14 @@ async def me(request: Request):
     #         print('valid access token and refresh token')
 
     # see app/db.py for the user table schema
-    return user
+    # return user
+    return {
+        "user_id": user[0],
+        "name": user[1],
+        "role": user[2],
+        "email": user[3],
+        "google_id": user[4],
+    }
 
 
 @app.post("/api/predict")
