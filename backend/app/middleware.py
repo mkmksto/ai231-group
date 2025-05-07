@@ -1,4 +1,5 @@
 from fastapi import HTTPException, Request
+from fastapi.responses import RedirectResponse
 from pydantic import ValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -27,7 +28,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
             refresh_token = RawRefreshTokenCookie(refresh_token=_refresh_token)
         except ValidationError as e:
             print("RT might be empty or expired")
-            raise HTTPException(status_code=401, detail=str(e))
+            return RedirectResponse(url="/", status_code=302)
+            # raise HTTPException(status_code=401, detail=str(e))
         print("both at and rt are strings")
         print("access token: ")
         print(access_token)
@@ -62,6 +64,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
                 return response
         else:
             print("rt is invalid")
-            raise HTTPException(status_code=401, detail="Invalid refresh token")
+            # Get the origin from the request headers
+            return RedirectResponse(url="/", status_code=302)
             # response = await call_next(request)
             # return response
