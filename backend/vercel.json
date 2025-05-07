@@ -15,22 +15,5 @@
       "src": "/(.*)",
       "dest": "app/main.py"
     }
-  ],
-  "functions": {
-    "../**": {
-      "excludeFiles": "{.next,*.cache,node_modules,public,app,*.engine,*.onnx,training,frontend}/**"
-    },
-    "backend/**": {
-      "excludeFiles": "**"
-    },
-    "frontend/**": {
-      "excludeFiles": "**"
-    },
-    "../backend/**": {
-      "excludeFiles": "**"
-    },
-    "../frontend/**": {
-      "excludeFiles": "**"
-    }
-  }
+  ]
 }

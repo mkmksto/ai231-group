@@ -8,7 +8,12 @@ from typing import Dict
 
 from app.auth import TokenOrDbUserPayload
 from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, File, Request, UploadFile
+from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.security import OAuth2PasswordBearer
 from fastapi.staticfiles import StaticFiles
+from PIL import Image
+from sqlalchemy.orm import Session
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
@@ -19,13 +24,9 @@ from app.auth import (
     create_access_token,
     create_refresh_token,
 )
-from app.db import get_db_connection, init_db
+from app.db import User, get_db, init_db
 from app.middleware import AuthMiddleware
 from app.utils import BACKEND_DIST_PATH
-from fastapi import Depends, FastAPI, File, Request, UploadFile
-from fastapi.responses import JSONResponse, RedirectResponse
-from fastapi.security import OAuth2PasswordBearer
-from PIL import Image
 
 # ML Imports
 # from numpy import ndarray
@@ -136,7 +137,7 @@ async def logout():
 
 
 @app.get("/api/auth/google/callback")
-async def callback(code: str):
+async def callback(code: str, db: Session = Depends(get_db)):
     token_url = "https://accounts.google.com/o/oauth2/token"
     data = {
         "code": code,
@@ -157,42 +158,30 @@ async def callback(code: str):
 
     # Find or create user
     print("finding or creating user")
-    conn = get_db_connection()
     try:
-        cursor = conn.cursor()
         # Find or create user
-        cursor.execute("SELECT * FROM users WHERE google_id = %s", (user_data["id"],))
-        user = cursor.fetchone()
+        user = db.query(User).filter(User.google_id == user_data["id"]).first()
 
         # Create user if they don't exist
         if not user:
             print("no existing user found, creating new user")
-            cursor.execute(
-                """
-                INSERT INTO users (name, email, google_id, created_at)
-                VALUES (%s, %s, %s, %s)
-                """,
-                (
-                    user_data["name"],
-                    user_data["email"],
-                    user_data["id"],
-                    datetime.now().isoformat(),
-                ),
+            user = User(
+                name=user_data["name"],
+                email=user_data["email"],
+                google_id=user_data["id"],
+                created_at=datetime.now(),
             )
-            conn.commit()
+            db.add(user)
+            db.commit()
+            db.refresh(user)
 
-            cursor.execute(
-                "SELECT * FROM users WHERE google_id = %s", (user_data["id"],)
-            )
-            user = cursor.fetchone()
-
-        # Convert user tuple to dict
+        # Convert user to dict
         user_dict = {
-            "user_id": user[0],
-            "name": user[1],
-            "role": user[2],
-            "email": user[3],
-            "google_id": user[4],
+            "user_id": user.user_id,
+            "name": user.name,
+            "role": user.role,
+            "email": user.email,
+            "google_id": user.google_id,
         }
 
         # create access and refresh tokens with user claims
@@ -224,41 +213,30 @@ async def callback(code: str):
             content={"message": f"Auth Error / Error in creating user: {str(e)}"},
         )
 
-    # do not edit anything below this line
-    finally:
-        conn.close()
-
     return response
-    # return RedirectResponse(FRONTEND_BASE_URL)
 
 
 @app.get("/api/me")
-async def me(request: Request):
+async def me(request: Request, db: Session = Depends(get_db)):
     print(">> .... inside /api/me")
     _user = request.state.user
     print("_user: ", _user)
     user = TokenOrDbUserPayload(**_user)
 
     # Get user from db after validating access token
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE user_id = %s", (user.user_id,))
-    user = cursor.fetchone()
-    conn.close()
+    db_user = db.query(User).filter(User.user_id == user.user_id).first()
+    if not db_user:
+        return JSONResponse(
+            status_code=404,
+            content={"message": "User not found"},
+        )
 
-    # if is_rt_valid:
-    #     print('context: inside auth middleware: refresh token is valid')
-    #     if is_at_valid and at_payload:
-    #         print('valid access token and refresh token')
-
-    # see app/db.py for the user table schema
-    # return user
     return {
-        "user_id": user[0],
-        "name": user[1],
-        "role": user[2],
-        "email": user[3],
-        "google_id": user[4],
+        "user_id": db_user.user_id,
+        "name": db_user.name,
+        "role": db_user.role,
+        "email": db_user.email,
+        "google_id": db_user.google_id,
     }
 
 
@@ -267,7 +245,6 @@ async def predict_tumor_class(
     file: UploadFile = File(...),
 ):
     try:
-
         contents = await file.read()
         image_from_frontend = Image.open(BytesIO(contents)).convert("RGB")
 

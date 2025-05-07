@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
 from os import getenv
+from typing import Optional
 
-from app.db import get_db_connection
+from app.db import User, get_db
 from dotenv import load_dotenv
 from jose import JWTError, jwt
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 load_dotenv()
 
@@ -39,7 +41,7 @@ class RawRefreshTokenCookie(BaseModel):
     refresh_token: str
 
 
-def create_access_token(data: dict, expires_delta: timedelta = None):
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
     expire = datetime.utcnow() + (
         expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -71,9 +73,13 @@ def get_at_payload(token: str):
         if not payload:
             return invalid_at_response
 
+        exp = payload.get("exp")
+        if exp is None:
+            return invalid_at_response
+
         return {
             "is_at_valid": True,
-            "is_at_expired": payload.get("exp") < datetime.utcnow().timestamp(),
+            "is_at_expired": exp < datetime.utcnow().timestamp(),
             "payload": payload,
         }
     except JWTError:
@@ -95,16 +101,20 @@ def get_rt_payload(token: str):
         if not payload:
             return invalid_rt_response
 
+        exp = payload.get("exp")
+        if exp is None:
+            return invalid_rt_response
+
         return {
             "is_rt_valid": True,
-            "is_rt_expired": payload.get("exp") < datetime.utcnow().timestamp(),
+            "is_rt_expired": exp < datetime.utcnow().timestamp(),
             "payload": payload,
         }
     except JWTError:
         return invalid_rt_response
 
 
-def refresh_at_token(refresh_token: str):
+def refresh_at_token(refresh_token: str, db: Session = next(get_db())):
     print("...inside refresh_at_token")
     is_rt_valid, is_rt_expired, payload = get_rt_payload(refresh_token).values()
     print(
@@ -118,21 +128,16 @@ def refresh_at_token(refresh_token: str):
     if not is_rt_valid or is_rt_expired or not rt_payload:
         raise JWTError("Invalid refresh token")
 
-    db_conn = get_db_connection()
-    cursor = db_conn.cursor()
-    cursor.execute(
-        "SELECT * FROM users WHERE user_id = %s", (rt_payload.get("user_id"),)
-    )
-    db_user = cursor.fetchone()
+    db_user = db.query(User).filter(User.user_id == rt_payload.get("user_id")).first()
     if not db_user:
         raise JWTError("User not found")
 
     user = {
-        "user_id": db_user[0],
-        "name": db_user[1],
-        "role": db_user[2],
-        "email": db_user[3],
-        "google_id": db_user[4],
+        "user_id": db_user.user_id,
+        "name": db_user.name,
+        "role": db_user.role,
+        "email": db_user.email,
+        "google_id": db_user.google_id,
     }
 
     return create_access_token(user)
