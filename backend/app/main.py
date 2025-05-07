@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 
 from .auth import TokenOrDbUserPayload
 from .db import ImageTable
+from .models import FeedbackInput
 from .storage import upload_to_gcs
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -247,6 +248,35 @@ async def me(request: Request, db: Session = Depends(get_db)):
     }
 
 
+@app.post("/api/feedback")
+async def feedback(
+    feedback_input: FeedbackInput,
+    db: Session = Depends(get_db),
+):
+    print("inside /api/feedback")
+    print("image_id: ", feedback_input.image_id)
+    print("label: ", feedback_input.label)
+    try:
+        image = (
+            db.query(ImageTable)
+            .filter(ImageTable.image_id == feedback_input.image_id)
+            .first()
+        )
+        if not image:
+            return JSONResponse(status_code=404, content={"message": "Image not found"})
+        image.label = feedback_input.label
+        image.update_date = datetime.now()
+        db.commit()
+        db.refresh(image)
+        return {
+            "success": True,
+        }
+    except Exception as e:
+        return JSONResponse(
+            status_code=500, content={"detail": f"Error processing image: {str(e)}"}
+        )
+
+
 @app.post("/api/predict")
 async def predict_tumor_class(
     file: UploadFile = File(...), db: Session = Depends(get_db)
@@ -276,6 +306,7 @@ async def predict_tumor_class(
         db.add(new_image)
         db.commit()
         db.refresh(new_image)
+        print("new_image id: ", new_image.image_id)
 
         class_mapping = {
             0: "glioma_tumor",

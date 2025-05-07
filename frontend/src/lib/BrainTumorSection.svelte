@@ -86,9 +86,34 @@
     }
   }
 
+  async function feedback(imageId: string, label: string) {
+    console.log('inside feedback');
+    console.log({imageId, label})
+    const response = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: {
+            'Content-Type': 'application/json'
+        },
+      body: JSON.stringify({ image_id: imageId, label }),
+    });
+    if (!response.ok) {
+      alert("Feedback failed: " + response.statusText);
+      console.error('Feedback failed:', response);
+      return;
+    }
+    const result = await response.json();
+    console.log('Feedback successful:', result);
+    alert("Feedback saved successfully.");
+  }
+
   function handleConfirmationChoice() {
       if (confirmationChoice === 'yes') {
-          handleSave(true);
+          if(!currentImageId || !currentPrediction) {
+            alert("No image ID or prediction found. Please try again.");
+            return;
+          }
+          feedback(currentImageId, currentPrediction);
+          // handleSave(true);
       } else if (confirmationChoice === 'no') {
           predictionConfirmed = false; // Mark as incorrect to show dropdown
       } else {
@@ -96,19 +121,25 @@
       }
   }
 
-  function handleSave(isCorrect: boolean) {
+  function handleSaveForIncorrectCase(isCorrect: boolean) {
     let finalPrediction = isCorrect ? currentPrediction : userSelectedClass;
-
-    if (!imageFile || !finalPrediction) {
-      console.error("Cannot save: Image file or final prediction missing.");
-      alert("Error: Cannot save data.");
+    if(!currentImageId || !finalPrediction) {
+      alert("No image ID found. Please try again.");
       return;
     }
+
+    feedback(currentImageId, finalPrediction);
+
+    // if (!imageFile || !finalPrediction) {
+    //   console.error("Cannot save: Image file or final prediction missing.");
+    //   alert("Error: Cannot save data.");
+    //   return;
+    // }
 
     console.log(`Saving data: Image='${imageFile.name}', Prediction='${finalPrediction}', Correct=${isCorrect}`);
     // TODO: Implement actual API call to backend to save imageFile and finalPrediction
     // Example: dispatch('savePrediction', { imageFile, prediction: finalPrediction });
-    alert(`Data for '${finalPrediction}' would be saved to DB here.`);
+    alert(`Data for '${finalPrediction}' would be saved to the DB, thank you for your feedback.`);
     predictionConfirmed = true; // Mark as confirmed/saved
     
     // Optional: Clear state after saving
@@ -166,7 +197,7 @@
                     <option value={option}>{option.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</option>
                   {/each}
                 </select>
-                <button on:click={() => handleSave(false)} disabled={!userSelectedClass}>Save Correction</button>
+                <button on:click={() => handleSaveForIncorrectCase(false)} disabled={!userSelectedClass}>Save Correction</button>
               </div>
             {/if}
           {/if} 
