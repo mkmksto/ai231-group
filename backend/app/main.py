@@ -1,16 +1,13 @@
-import base64
 import os
+import random
 import sys
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
 from typing import Dict, Union
 
-import torch
-import torch.nn.functional as F
 from dotenv import load_dotenv
 from fastapi.staticfiles import StaticFiles
-from numpy import ndarray
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
@@ -29,9 +26,12 @@ from fastapi import Depends, FastAPI, File, Request, UploadFile
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer
 from PIL import Image
-from pydantic import BaseModel
 
-from training.inference_engine.tensor_rt_inference import BrainTumorClassifier
+# ML Imports
+# from numpy import ndarray
+# import torch
+# import torch.nn.functional as F
+# from training.inference_engine.tensor_rt_inference import BrainTumorClassifier
 
 #
 # ----
@@ -48,18 +48,21 @@ linux_engine = "training/inference_engine/brain_tumor_linux.engine"
 windows_engine = "training/inference_engine/brain_tumor.engine"
 
 # Select engine based on OS
+engine_path = windows_engine
 if sys.platform.startswith("linux"):
     engine_path = linux_engine
 elif sys.platform.startswith("win"):
     engine_path = windows_engine
 else:
-    raise OSError("Unsupported operating system. Only Linux and Windows are supported.")
+    print("Unsupported operating system. Only Linux and Windows are supported.")
+    # raise OSError("Unsupported operating system. Only Linux and Windows are supported.")
 
 model_location = Path(root_dir / engine_path)
 print(f"Using engine: {model_location}")
 print(model_location.exists())
 print(model_location.absolute())
-model = BrainTumorClassifier(model_location)
+
+# model = BrainTumorClassifier(model_location)
 
 load_dotenv()
 
@@ -129,11 +132,12 @@ async def callback(code: str):
         "grant_type": "authorization_code",
     }
 
-    google_res = requests.post(token_url, data=data)
+    google_res = requests.post(token_url, data=data, timeout=10)
     access_token = google_res.json().get("access_token")
     user_info = requests.get(
         "https://www.googleapis.com/oauth2/v1/userinfo",
         headers={"Authorization": f"Bearer {access_token}"},
+        timeout=10,
     )
     user_data = user_info.json()
 
@@ -264,28 +268,16 @@ async def predict_tumor_class(
         contents = await file.read()
         image_from_frontend = Image.open(BytesIO(contents)).convert("RGB")
 
-        output: ndarray = model.inference(image_from_frontend)
-        print("output: ", output)
-        print("output dimensions: ", output.shape)
-
-        # Apply softmax to get probabilities
-        probabilities = torch.nn.functional.softmax(torch.from_numpy(output), dim=1)
-        confidence = probabilities.max().item()
-        print("confidence: ", confidence)
-
-        predicted_class_number = output.argmax().item()
-        print(predicted_class_number)  # Output: 1
-
-        # Mapping to label (optional):
         class_mapping = {
             0: "glioma_tumor",
             1: "meningioma_tumor",
             2: "no_tumor",
             3: "pituitary_tumor",
         }
+        print(class_mapping)
 
-        predicted_class = class_mapping[predicted_class_number]
-        print("predicted_class", predicted_class)
+        predicted_class = random.choice(list(class_mapping.values()))
+        confidence = random.random()
 
         return JSONResponse(
             {
@@ -293,6 +285,37 @@ async def predict_tumor_class(
                 "confidence": confidence,  # Actual confidence score from model
             }
         )
+
+        # # uncomment when using the actual model
+        # output: ndarray = model.inference(image_from_frontend)
+        # print("output: ", output)
+        # print("output dimensions: ", output.shape)
+
+        # # Apply softmax to get probabilities
+        # probabilities = torch.nn.functional.softmax(torch.from_numpy(output), dim=1)
+        # confidence = probabilities.max().item()
+        # print("confidence: ", confidence)
+
+        # predicted_class_number = output.argmax().item()
+        # print(predicted_class_number)  # Output: 1
+
+        # # Mapping to label (optional):
+        # class_mapping = {
+        #     0: "glioma_tumor",
+        #     1: "meningioma_tumor",
+        #     2: "no_tumor",
+        #     3: "pituitary_tumor",
+        # }
+
+        # predicted_class = class_mapping[predicted_class_number]
+        # print("predicted_class", predicted_class)
+
+        # return JSONResponse(
+        #     {
+        #         "prediction": predicted_class,
+        #         "confidence": confidence,  # Actual confidence score from model
+        #     }
+        # )
 
     except Exception as e:
         return JSONResponse(
