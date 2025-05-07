@@ -15,5 +15,14 @@
       "src": "/(.*)",
       "dest": "app/main.py"
     }
-  ]
+  ],
+  "functions": {
+    "../**": {
+      "excludeFiles": "{.next,*.cache,node_modules,public,app,*.engine,*.onnx,training,frontend}/**"
+    },
+    "backend/**": "*",
+    "frontend/**": "*",
+    "../backend/**": "*",
+    "../frontend/**": "*"
+  }
 }
