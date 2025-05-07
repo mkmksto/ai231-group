@@ -1,12 +1,14 @@
 <script lang="ts">
+  import { sleep } from '../utils/utils';
   import ImageUploader from './ImageUploader.svelte';
   import PredictionResult from './PredictionResult.svelte';
-  import { sleep } from '../utils/utils'; // Adjusted path
+// Adjusted path
   import { createEventDispatcher } from 'svelte';
 
   // State variables internal to this component
   let currentPrediction: string | null = null;
   let currentConfidence: number | null = null;
+  let currentImageId: string | null = null;
   let currentError: string | null = null;
   let imageFile: File | null = null;
   let predictionConfirmed: boolean | null = null; // null: not asked, true: yes, false: no
@@ -34,6 +36,7 @@
       currentPrediction = null;
       currentConfidence = null;
       currentError = null;
+      currentImageId = null;
       return;
     }
 
@@ -65,10 +68,12 @@
       const result = await response.json();
       currentPrediction = result.prediction;
       currentConfidence = result.confidence;
+      currentImageId = result.image_id;
       currentError = null;
       predictionConfirmed = null; // Reset confirmation state
       userSelectedClass = null;
       confirmationChoice = null; // Reset radio choice
+      console.log("currentImageId: ", currentImageId);
 
     } catch (err: any) {
       console.error('Upload failed:', err);

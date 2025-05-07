@@ -1,6 +1,7 @@
 import os
 import random
 import sys
+import uuid
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
@@ -15,6 +16,7 @@ from PIL import Image
 from sqlalchemy.orm import Session
 
 from .auth import TokenOrDbUserPayload
+from .db import ImageTable
 from .storage import upload_to_gcs
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -247,7 +249,7 @@ async def me(request: Request, db: Session = Depends(get_db)):
 
 @app.post("/api/predict")
 async def predict_tumor_class(
-    file: UploadFile = File(...),
+    file: UploadFile = File(...), db: Session = Depends(get_db)
 ):
     try:
         contents = await file.read()
@@ -259,10 +261,21 @@ async def predict_tumor_class(
         destination_blob_name = (
             f"uploads/{datetime.now().strftime('%Y%m%d_%H%M%S')}_{file.filename}"
         )
-        upload_to_gcs(
+        gcs_path = upload_to_gcs(
             source_file_path=temp_path,
             destination_blob_name=destination_blob_name,
         )
+        new_image = ImageTable(
+            image_id=str(uuid.uuid4()),
+            s3_link=gcs_path,
+            upload_date=datetime.now(),
+            update_date=datetime.now(),
+            label="",
+            img_type="feedback",
+        )
+        db.add(new_image)
+        db.commit()
+        db.refresh(new_image)
 
         class_mapping = {
             0: "glioma_tumor",
@@ -279,6 +292,7 @@ async def predict_tumor_class(
             {
                 "prediction": predicted_class,
                 "confidence": confidence,  # Actual confidence score from model
+                "image_id": new_image.image_id,
             }
         )
 

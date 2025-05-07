@@ -64,15 +64,15 @@ class Model(Base):
 
 
 # Define Image model
-class Image(Base):
+class ImageTable(Base):
     __tablename__ = "images"
 
     image_id = Column(String, primary_key=True, index=True)  # uuid as str
     s3_link = Column(String, nullable=False)
     upload_date = Column(DateTime, nullable=False)
     update_date = Column(DateTime)
-    label = Column(String)  # label_enum (nullable)
-    img_type = Column(String)  # image_type_enum (nullable)
+    label = Column(String)  # label_enum (nullable) (glioma, etc)
+    img_type = Column(String)  # image_type_enum (nullable) (original or feedback)
 
 
 # Define TrainingRun model
