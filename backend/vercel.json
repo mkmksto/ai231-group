@@ -20,9 +20,17 @@
     "../**": {
       "excludeFiles": "{.next,*.cache,node_modules,public,app,*.engine,*.onnx,training,frontend}/**"
     },
-    "backend/**": "*",
-    "frontend/**": "*",
-    "../backend/**": "*",
-    "../frontend/**": "*"
+    "backend/**": {
+      "excludeFiles": "**"
+    },
+    "frontend/**": {
+      "excludeFiles": "**"
+    },
+    "../backend/**": {
+      "excludeFiles": "**"
+    },
+    "../frontend/**": {
+      "excludeFiles": "**"
+    }
   }
 }
