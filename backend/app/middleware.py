@@ -22,10 +22,13 @@ FRONTEND_BASE_URL = os.getenv("FRONTEND_BASE_URL")
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         print(">>>> inside auth middleware ---------------------------- ")
-        allowed_paths = ["/api/auth", "/", "/assets", "/health"]
+        allowed_paths = ["/api/auth", "/assets", "/health"]
 
         # Check if the request path starts with any of the allowed paths
-        if any(request.url.path.startswith(path) for path in allowed_paths):
+        if (
+            any(request.url.path.startswith(path) for path in allowed_paths)
+            or request.url.path == "/"
+        ):
             print("...inside auth middleware: allowed endpoint, skipping auth check")
             return await call_next(request)
 
