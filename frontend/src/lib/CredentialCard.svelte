@@ -1,12 +1,13 @@
 <script lang="ts">
-  import { User, IdentificationCard, SignOut, SignIn, UserPlus, Envelope, Lock, ShieldCheck } from 'phosphor-svelte';
+  import { Envelope, IdentificationCard, ShieldCheck, SignOut, User } from 'phosphor-svelte';
   import { createEventDispatcher } from 'svelte';
 
   // Define the User type matching App.svelte
   interface User {
     name: string;
-    email: string; // Email is always present in the user object now
-    credentials?: string;
+    email: string;
+    credentials?: string; // Optional for login display
+    role: string;
   }
 
   // Accept the user object prop
@@ -14,51 +15,54 @@
 
   // Internal state for login/register form
   let isRegisterMode = false;
-  let email = '';
-  let password = '';
-  let name = '';
-  let credentials = '';
+  // let email = '';
+  // let password = '';
+  // let name = '';
+  // let credentials = '';
 
   const dispatch = createEventDispatcher();
 
   function handleLogout() {
+    fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
     dispatch('logout');
   }
 
   function submitLogin() {
-      if (!email || !password) {
-          alert('Please enter email and password.');
-          return;
-      }
-      console.log('Dispatching login');
-      dispatch('login', { email: email, pass: password });
-      // Clear form after attempt
-      email = '';
-      password = '';
+    // this sends a request to the backend which initiates the google oauth flow
+    // the user is redirected to the google login page
+
+    // if successful, the user is redirected back to the frontend
+    console.log("handleContinueWithGoogle");
+    setTimeout(() => {
+      window.location.href = "/api/auth/google/login";
+    }, 100);
   }
 
-  function submitRegister() {
-      if (!name || !email || !password) {
-          alert('Please enter name, email, and password.');
-          return;
-      }
-       console.log('Dispatching register');
-      dispatch('register', { name: name, email: email, pass: password, credentials: credentials });
-       // Clear form after attempt
-      name = '';
-      email = '';
-      password = '';
-      credentials = '';
-      isRegisterMode = false; // Switch back to login view after registration attempt
-  }
+  // function submitRegister() {
+  //     if (!name || !email || !password) {
+  //         alert('Please enter name, email, and password.');
+  //         return;
+  //     }
+  //      console.log('Dispatching register');
+  //     dispatch('register', { name: name, email: email, pass: password, credentials: credentials });
+  //      // Clear form after attempt
+  //     name = '';
+  //     email = '';
+  //     password = '';
+  //     credentials = '';
+  //     isRegisterMode = false; // Switch back to login view after registration attempt
+  // }
 
   function toggleMode() {
       isRegisterMode = !isRegisterMode;
-      // Clear fields when toggling
-      email = '';
-      password = '';
-      name = '';
-      credentials = '';
+      // // Clear fields when toggling
+      // email = '';
+      // password = '';
+      // name = '';
+      // credentials = '';
   }
 
 </script>
@@ -71,6 +75,15 @@
         <User size={20} />
         <span>{user.name}</span>
       </div>
+      <div class="info-item">
+        <Envelope size={20} />
+        <span>{user.email}</span>
+      </div>
+      <div class="info-item">
+        <ShieldCheck size={20} />
+        <span>{user.role}</span>
+      </div>
+
       {#if user.credentials}
         <div class="info-item">
           <IdentificationCard size={20} />
@@ -85,8 +98,7 @@
 {:else}
   <!-- === LOGGED OUT VIEW (LOGIN/REGISTER FORM) === -->
   <div class="credential-card logged-out">
-    {#if isRegisterMode}
-      <!-- REGISTER FORM -->
+    <!-- {#if isRegisterMode}
       <form class="auth-form" on:submit|preventDefault={submitRegister}>
         <h4><UserPlus size={20} /> Register New Account</h4>
         <div class="form-group">
@@ -109,25 +121,13 @@
           <button type="submit" class="submit-button register">Register</button>
           <button type="button" on:click={toggleMode} class="toggle-button">Switch to Login</button>
         </div>
-      </form>
-    {:else}
+      </form> -->
       <!-- LOGIN FORM -->
       <form class="auth-form" on:submit|preventDefault={submitLogin}>
-        <h4><SignIn size={20} /> Login to Your Account</h4>
-         <div class="form-group">
-            <Envelope size={16} /><label for="login-email">Email:</label>
-            <input type="email" id="login-email" bind:value={email} required placeholder="your@email.com"/>
-        </div>
-        <div class="form-group">
-            <Lock size={16} /><label for="login-password">Password:</label>
-            <input type="password" id="login-password" bind:value={password} required placeholder="********"/>
-        </div>
          <div class="form-actions">
-          <button type="submit" class="submit-button login">Login</button>
-          <button type="button" on:click={toggleMode} class="toggle-button">Create Account</button>
+          <button type="submit" class="submit-button login">Continue with Google</button>
         </div>
       </form>
-    {/if}
   </div>
 {/if}
 

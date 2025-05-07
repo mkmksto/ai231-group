@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import NavBar from './lib/NavBar.svelte';
-  import DashboardSection from './lib/DashboardSection.svelte';
-  import CredentialCard from './lib/CredentialCard.svelte';
+  import { Bandaids, Bone, Brain, Dna, Eye, Heartbeat, Stethoscope, Virus } from 'phosphor-svelte';
   import BrainTumorSection from './lib/BrainTumorSection.svelte';
-  import { Brain, Heartbeat, Stethoscope, Virus, Eye, Bandaids, Dna, Bone } from 'phosphor-svelte'; // Icons for sections
+  import CredentialCard from './lib/CredentialCard.svelte';
+  import DashboardSection from './lib/DashboardSection.svelte';
+  import NavBar from './lib/NavBar.svelte';
+// Icons for sections
   import AnimatedBackground from './lib/AnimatedBackground.svelte'; // <-- Import background
 
   // --- Navigation --- 
@@ -28,47 +28,71 @@
     name: string;
     email: string;
     credentials?: string; // Optional for login display
+    role: string;
   }
 
-  let currentUser: User | null = { name: "Dr. Michael Quinto", email: "mquinto@diagnostech.ai", credentials: "MD, NeuroAI Specialist" }; // Example logged-in user
+  // let currentUser: User | null = { name: "Dr. Michael Quinto", email: "mquinto@diagnostech.ai", credentials: "MD, NeuroAI Specialist" }; // Example logged-in user
+  let currentUser: User | null = null
 
   function handleLogout() {
     currentUser = null; // Set user to null on logout
     // TODO: Add actual logout logic (clear tokens, redirect, etc.)
-    alert("Logged out (simulated).");
+    alert("Logged out successfully.");
   }
 
-  // Placeholder function to handle login attempt
-  function handleLogin(event: CustomEvent<{ email: string; pass: string }>) {
-    const { email, pass } = event.detail;
-    console.log(`Simulating login for: ${email}`);
-    // TODO: Replace with actual API call to backend for authentication
-    // For demo: Log in anyone who tries
-    if (email && pass) {
-      currentUser = {
-        name: "Demo User", // Replace with name from backend
-        email: email,
-        credentials: "Demo Credentials" // Replace with credentials from backend if available
-      };
-      alert(`Logged in as ${currentUser.name} (simulated).`);
-    } else {
-      alert("Login failed (simulated - need email/password).");
-    }
+  // // Placeholder function to handle login attempt
+  // function handleContinueWithGoogle(event: CustomEvent<{ email: string; pass: string }>) {
+  //   console.log("handleContinueWithGoogle");
+  //   setTimeout(() => {
+  //     window.location.href = "/api/auth/google/login";
+  //   }, 100);
+
+  //   // const { email, pass } = event.detail;
+  //   // console.log(`Simulating login for: ${email}`);
+  //   // TODO: Replace with actual API call to backend for authentication
+  //   // For demo: Log in anyone who tries
+  //   // if (email && pass) {
+  //   //   currentUser = {
+  //   //     name: "Demo User", // Replace with name from backend
+  //   //     email: email,
+  //   //     credentials: "Demo Credentials" // Replace with credentials from backend if available
+  //   //   };
+  //   //   alert(`Logged in as ${currentUser.name} (simulated).`);
+  //   // } else {
+  //   //   alert("Login failed (simulated - need email/password).");
+  //   // }
+  // }
+
+  // // Placeholder function to handle registration attempt
+  // function handleRegister(event: CustomEvent<{ name: string; email: string; pass: string; credentials?: string }>) {
+  //   const { name, email, pass, credentials } = event.detail;
+  //   console.log(`Simulating registration for: ${name} <${email}>`);
+  //   // TODO: Replace with actual API call to backend for registration
+  //   // For demo: Register and log in the user immediately
+  //   if (name && email && pass) {
+  //     currentUser = { name, email, credentials };
+  //     alert(`Registered and logged in as ${currentUser.name} (simulated).`);
+  //   } else {
+  //     alert("Registration failed (simulated - need name/email/password).");
+  //   }
+  // }
+
+  async function getMe() {
+    // this is where we get the user's information from the backend
+    // then we conditionally render whether the person is logged in or not  based on the response
+    // if no response / error, then we render the login page / footer
+    // if with response, then we render their user info
+    const response = await fetch("/api/auth/me", {
+      method: "GET",
+      credentials: "include",
+    });
+    const data = await response.json() as User;
+    console.log(data);
+    currentUser = data;
   }
 
-  // Placeholder function to handle registration attempt
-  function handleRegister(event: CustomEvent<{ name: string; email: string; pass: string; credentials?: string }>) {
-    const { name, email, pass, credentials } = event.detail;
-    console.log(`Simulating registration for: ${name} <${email}>`);
-    // TODO: Replace with actual API call to backend for registration
-    // For demo: Register and log in the user immediately
-    if (name && email && pass) {
-      currentUser = { name, email, credentials };
-      alert(`Registered and logged in as ${currentUser.name} (simulated).`);
-    } else {
-      alert("Registration failed (simulated - need name/email/password).");
-    }
-  }
+  getMe();
+
 
   // --- Navigation Handler ---
   function handleNavClick(event: CustomEvent<string>) {
@@ -120,8 +144,6 @@
   <CredentialCard 
     user={currentUser} 
     on:logout={handleLogout}
-    on:login={handleLogin} 
-    on:register={handleRegister}
   />
 </div>
 
