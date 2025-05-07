@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 DATABASE_PATH = Path(os.getenv("DATABASE_PATH")).resolve()
 print(f"DATABASE_PATH: {DATABASE_PATH}")
+print(f"database exists: {DATABASE_PATH.exists()}")
 
 
 def init_db():
