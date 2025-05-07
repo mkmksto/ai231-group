@@ -21,7 +21,8 @@ def init_db():
     conn = psycopg2.connect(DATABASE_PATH)
     try:
         cursor = conn.cursor()
-        cursor.execute(
+
+        create_table_commands = [
             """
             CREATE TABLE IF NOT EXISTS users (
                 user_id SERIAL PRIMARY KEY,
@@ -34,19 +35,9 @@ def init_db():
                 license_number TEXT
             );
             """
-            # """
-            # CREATE TABLE IF NOT EXISTS users (
-            #     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            #     name TEXT NOT NULL,
-            #     role TEXT CHECK(role IN ('sysadmin', 'user')) DEFAULT 'user',
-            #     email TEXT UNIQUE NOT NULL,
-            #     google_id TEXT UNIQUE NOT NULL,
-            #     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            #     salutation TEXT DEFAULT 'Dr.',
-            #     license_number TEXT DEFAULT NULL
-            # )
-            # """
-        )
+        ]
+        for command in create_table_commands:
+            cursor.execute(command)
         conn.commit()
     finally:
         conn.close()
