@@ -1,22 +1,25 @@
-import base64
+# import base64
 import os
 import random
 import sys
-from io import BytesIO
+
+# from io import BytesIO
 from pathlib import Path
-from typing import Dict, Union
+from typing import Dict
 
 from dotenv import load_dotenv
 from fastapi.staticfiles import StaticFiles
-from numpy import ndarray
+
+# from numpy import ndarray
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
-from app.utils import BACKEND_DIST_PATH
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
-from PIL import Image
-from pydantic import BaseModel
+
+# from PIL import Image
+# from pydantic import BaseModel
+from app.utils import BACKEND_DIST_PATH
 
 #
 # ----
@@ -81,8 +84,7 @@ async def predict_tumor_class(
     file: UploadFile = File(...),
 ):
     try:
-
-        contents = await file.read()
+        # contents = await file.read()
         # image_from_frontend = Image.open(BytesIO(contents)).convert("RGB")
 
         # output: ndarray = model.inference(image_from_frontend)
