@@ -10,6 +10,7 @@ from sqlalchemy import (
     Integer,
     String,
     create_engine,
+    func,
 )
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
@@ -41,7 +42,7 @@ class User(Base):
     role = Column(String, default="user")
     email = Column(String, unique=True, nullable=False)
     google_id = Column(String, unique=True, nullable=False)
-    created_at = Column(DateTime, server_default="CURRENT_TIMESTAMP")
+    created_at = Column(DateTime, server_default=func.now())
     salutation = Column(String, default="Dr.")
     license_number = Column(String)
 
