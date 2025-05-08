@@ -264,8 +264,10 @@ async def feedback(
         )
         if not image:
             return JSONResponse(status_code=404, content={"message": "Image not found"})
-        image.label = feedback_input.label
-        image.update_date = datetime.now()
+        setattr(image, "label", feedback_input.label)
+        setattr(image, "update_date", datetime.now())
+        # image.label = feedback_input.label
+        # image.update_date = datetime.now()
         db.commit()
         db.refresh(image)
         return {

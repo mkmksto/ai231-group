@@ -2,7 +2,6 @@ import os
 
 from dotenv import load_dotenv
 from fastapi import HTTPException, Request
-from fastapi.responses import RedirectResponse
 from pydantic import ValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -79,3 +78,5 @@ class AuthMiddleware(BaseHTTPMiddleware):
             raise HTTPException(status_code=401, detail="Invalid refresh token")
             # response = await call_next(request)
             # return response
+
+        raise HTTPException(status_code=401, detail="Invalid refresh token")

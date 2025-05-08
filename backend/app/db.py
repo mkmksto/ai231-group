@@ -15,17 +15,11 @@ from sqlalchemy import (
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 
-# import sqlite3
-# from pathlib import Path
-
-
 load_dotenv()
-# DATABASE_PATH = Path(os.getenv("DATABASE_PATH")).resolve()
 DATABASE_URL = os.getenv("DATABASE_PATH")
 if not DATABASE_URL:
     raise ValueError("DATABASE_PATH is not set")
 print(f"DATABASE_PATH: {DATABASE_URL}")
-# print(f"database exists: {DATABASE_PATH.exists()}")
 
 # Create SQLAlchemy engine
 engine = create_engine(DATABASE_URL)

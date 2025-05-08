@@ -15,9 +15,7 @@ if not BUCKET_NAME or not CREDENTIALS_FILE_BASE_64:
 
 
 def get_storage_client():
-    """Get a storage client using credentials from environment variable."""
     if CREDENTIALS_FILE_BASE_64:
-        # Decode the base64 credentials
         credentials_json = base64.b64decode(CREDENTIALS_FILE_BASE_64).decode("utf-8")
         credentials_info = json.loads(credentials_json)
         credentials = service_account.Credentials.from_service_account_info(
@@ -30,13 +28,9 @@ def get_storage_client():
 
 
 def upload_to_gcs(
-    # bucket_name: str,
     source_file_path: str,
     destination_blob_name: str,
-    # credentials_file: str,
 ):
-    """Uploads a file to Google Cloud Storage."""
-    # storage_client = storage.Client.from_service_account_json(CREDENTIALS_FILE)
     storage_client = get_storage_client()
     bucket = storage_client.bucket(BUCKET_NAME)
     blob = bucket.blob(destination_blob_name)
@@ -46,8 +40,6 @@ def upload_to_gcs(
 
 
 def download_image(source_blob_name: str, destination_file_path: str) -> None:
-    """Downloads an image from the specified GCS bucket."""
-    # client = storage.Client()
     client = get_storage_client()
     bucket = client.bucket(BUCKET_NAME)
     blob = bucket.blob(source_blob_name)
