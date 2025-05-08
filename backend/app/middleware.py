@@ -43,8 +43,6 @@ class AuthMiddleware(BaseHTTPMiddleware):
             # return RedirectResponse(url=FRONTEND_BASE_URL, status_code=302)
             raise HTTPException(status_code=401, detail=str(e))
         print("both at and rt are strings")
-        print("access token: ")
-        print(access_token)
 
         at_payload: dict = get_at_payload(access_token.access_token)
         rt_payload: dict = get_rt_payload(refresh_token.refresh_token)

@@ -281,6 +281,7 @@ async def feedback(
 async def predict_tumor_class(
     file: UploadFile = File(...), db: Session = Depends(get_db)
 ):
+    print("---- inside /api/predict")
     try:
         contents = await file.read()
         image_from_frontend = Image.open(BytesIO(contents)).convert("RGB")

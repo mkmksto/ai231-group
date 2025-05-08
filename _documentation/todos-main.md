@@ -1,8 +1,5 @@
 # TODOs
 
-- provision DB for feedback, etc.
-- S3 bucket for images and models
-
 - retraining endpoint (script by jouh)
 - endpoint for checking number of feedback dataset
 - gh actions for checking how many feedback images are already present
