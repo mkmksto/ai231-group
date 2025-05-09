@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 from .auth import TokenOrDbUserPayload
 from .db import ImageTable
 from .models import FeedbackInput
-from .storage import upload_to_gcs
+from .storage import BUCKET_NAME, update_blob_metadata, upload_to_gcs
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
@@ -264,12 +264,28 @@ async def feedback(
         )
         if not image:
             return JSONResponse(status_code=404, content={"message": "Image not found"})
+
+        # Update database
         setattr(image, "label", feedback_input.label)
         setattr(image, "update_date", datetime.now())
-        # image.label = feedback_input.label
-        # image.update_date = datetime.now()
         db.commit()
         db.refresh(image)
+
+        # Update GCS metadata
+        # Extract blob name from GCS path (remove gs://bucket-name/ prefix)
+        gcs_path = image.s3_link
+        print("gcs_path: ", gcs_path)
+        if gcs_path.startswith(f"gs://{BUCKET_NAME}/"):
+            blob_name = gcs_path[len(f"gs://{BUCKET_NAME}/") :]
+            print("blob_name: ", blob_name)
+            update_blob_metadata(
+                blob_name,
+                {
+                    "true_label": feedback_input.label,
+                    "last_updated": datetime.now().isoformat(),
+                },
+            )
+
         return {
             "success": True,
         }
