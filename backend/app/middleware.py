@@ -25,7 +25,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
         # Check if the request path starts with any of the allowed paths
         if (
-            any(request.url.path.startswith(path) for path in allowed_paths)
+            any(request.url.path.startswith(path) for path in allowed_paths)  # dev
             or request.url.path == "/"
         ):
             print("...inside auth middleware: allowed endpoint, skipping auth check")

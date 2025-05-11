@@ -58,7 +58,8 @@ if sys.platform.startswith("linux"):
 elif sys.platform.startswith("win"):
     engine_path = windows_engine
 else:
-    print("Unsupported operating system. Only Linux and Windows are supported.")
+    # print("Unsupported operating system. Only Linux and Windows are supported.")
+    pass
     # raise OSError("Unsupported operating system. Only Linux and Windows are supported.")
 
 model_location = Path(root_dir / engine_path)
@@ -93,12 +94,14 @@ GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
 FRONTEND_BASE_URL = os.getenv("FRONTEND_BASE_URL")
+GOOGLE_COMPUTE_ENDPOINT = os.getenv("GOOGLE_COMPUTE_ENDPOINT")
 if any(
     [
         GOOGLE_CLIENT_ID is None,
         GOOGLE_CLIENT_SECRET is None,
         GOOGLE_REDIRECT_URI is None,
         FRONTEND_BASE_URL is None,
+        GOOGLE_COMPUTE_ENDPOINT is None,
     ]
 ):
     raise ValueError("Missing environment variables")
@@ -228,7 +231,7 @@ async def callback(code: str, db: Session = Depends(get_db)):
 async def me(request: Request, db: Session = Depends(get_db)):
     print(">> .... inside /api/me")
     _user = request.state.user
-    print("_user name: ", _user["name"])
+    print("_user id: ", _user["user_id"])
     user = TokenOrDbUserPayload(**_user)
 
     # Get user from db after validating access token
@@ -273,7 +276,7 @@ async def feedback(
 
         # Update GCS metadata
         # Extract blob name from GCS path (remove gs://bucket-name/ prefix)
-        gcs_path = image.s3_link
+        gcs_path = str(image.s3_link)
         print("gcs_path: ", gcs_path)
         if gcs_path.startswith(f"gs://{BUCKET_NAME}/"):
             blob_name = gcs_path[len(f"gs://{BUCKET_NAME}/") :]
@@ -325,18 +328,26 @@ async def predict_tumor_class(
         db.add(new_image)
         db.commit()
         db.refresh(new_image)
-        print("new_image id: ", new_image.image_id)
+        # print("new_image id: ", new_image.image_id)
 
-        class_mapping = {
-            0: "glioma_tumor",
-            1: "meningioma_tumor",
-            2: "no_tumor",
-            3: "pituitary_tumor",
-        }
-        print(class_mapping)
+        # class_mapping = {
+        #     0: "glioma_tumor",
+        #     1: "meningioma_tumor",
+        #     2: "no_tumor",
+        #     3: "pituitary_tumor",
+        # }
+        endpoint = f"{GOOGLE_COMPUTE_ENDPOINT}"
+        response = requests.post(
+            endpoint,
+            json={"uri": new_image.s3_link},
+            headers={"Accept": "application/json", "Content-Type": "application/json"},
+        )
+        response_json = response.json()
+        predicted_class = response_json.get("predicted_class", "prediction failed")
+        confidence = response_json.get("confidence", 0.0)
 
-        predicted_class = random.choice(list(class_mapping.values()))
-        confidence = random.random()
+        # predicted_class = random.choice(list(class_mapping.values()))
+        # confidence = random.uniform(0.7, 0.98)
 
         return JSONResponse(
             {

@@ -19,7 +19,14 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_PATH")
 if not DATABASE_URL:
     raise ValueError("DATABASE_PATH is not set")
-print(f"DATABASE_PATH: {DATABASE_URL}")
+# Mask the password in the database URL before printing
+masked_url = DATABASE_URL.replace(
+    DATABASE_URL.split("@")[0].split(":")[-2]
+    + ":"
+    + DATABASE_URL.split("@")[0].split(":")[-1],
+    "****",
+)
+print(f"DATABASE_PATH: {masked_url}")
 
 # Create SQLAlchemy engine
 engine = create_engine(DATABASE_URL)

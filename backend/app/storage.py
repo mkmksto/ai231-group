@@ -35,7 +35,7 @@ def upload_to_gcs(
     bucket = storage_client.bucket(BUCKET_NAME)
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename(source_file_path)
-    print(f"uploaded to gs://{BUCKET_NAME}/{destination_blob_name}")
+    # print(f"uploaded to gs://{BUCKET_NAME}/{destination_blob_name}")
     return f"gs://{BUCKET_NAME}/{destination_blob_name}"
 
 
