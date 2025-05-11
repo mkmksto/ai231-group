@@ -54,7 +54,7 @@
         body: formData,
       });
 
-      await sleep(1000); // Slightly shorter simulated delay
+      await sleep(300); // Slightly shorter simulated delay
 
       if (!response.ok) {
         let errorMsg = `HTTP error! Status: ${response.status}`;

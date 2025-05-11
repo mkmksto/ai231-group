@@ -14,8 +14,8 @@ load_dotenv()
 ACCESS_TOKEN_SECRET = getenv("ACCESS_TOKEN_SECRET")
 REFRESH_TOKEN_SECRET = getenv("REFRESH_TOKEN_SECRET")
 ALGORITHM = "HS256"
-# ACCESS_TOKEN_EXPIRE_MINUTES = 0.2
-ACCESS_TOKEN_EXPIRE_MINUTES = 5
+# ACCESS_TOKEN_EXPIRE_MINUTES = 0.2 # dev
+ACCESS_TOKEN_EXPIRE_MINUTES = 10
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 if ACCESS_TOKEN_SECRET is None:
@@ -122,7 +122,7 @@ def refresh_at_token(refresh_token: str, db: Session = next(get_db())):
         {
             "is_rt_valid": is_rt_valid,
             "is_rt_expired": is_rt_expired,
-            "payload": payload,
+            # "payload": payload,
         }
     )
     rt_payload = payload

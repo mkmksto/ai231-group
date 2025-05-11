@@ -35,7 +35,7 @@ def upload_to_gcs(
     bucket = storage_client.bucket(BUCKET_NAME)
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename(source_file_path)
-    print(f"uploaded to gs://{BUCKET_NAME}/{destination_blob_name}")
+    # print(f"uploaded to gs://{BUCKET_NAME}/{destination_blob_name}")
     return f"gs://{BUCKET_NAME}/{destination_blob_name}"
 
 
@@ -44,3 +44,22 @@ def download_image(source_blob_name: str, destination_file_path: str) -> None:
     bucket = client.bucket(BUCKET_NAME)
     blob = bucket.blob(source_blob_name)
     blob.download_to_filename(destination_file_path)
+
+
+def update_blob_metadata(blob_name: str, metadata: dict) -> None:
+    storage_client = get_storage_client()
+    bucket = storage_client.bucket(BUCKET_NAME)
+    blob = bucket.blob(blob_name)
+
+    # Get existing metadata
+    blob.reload()
+    current_metadata = blob.metadata or {}
+    print("current_metadata: ", current_metadata)
+
+    # Update with new metadata
+    current_metadata.update(metadata)
+    print("updated metadata: ", current_metadata)
+
+    # Set the updated metadata
+    blob.metadata = current_metadata
+    blob.patch()
