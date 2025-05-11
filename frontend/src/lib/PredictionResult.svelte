@@ -1,5 +1,6 @@
 <script lang="ts">
-  import WojakLoading from '../assets/wojak-loading-wojak.gif';
+  // import WojakLoading from '../assets/wojak-loading-wojak.gif';
+  import BrainGif from '../assets/ai-brain.gif';
 
   // 'export let' defines a prop that can be passed to this component
   export let prediction: string | null = null; // e.g., 'glioma_tumor', 'no_tumor', 'loading', 'error'
@@ -32,7 +33,7 @@
 
 <div class="result-container" class:highlighted={highlight}>
   {#if prediction === 'loading'}
-    <img src={WojakLoading} alt="Loading..." class="loading-gif" style="width: 200px;" />
+        <img src={BrainGif} alt="Loading..." class="loading-gif" style="width: 300px; height:300px" />
   {:else}
     <p class="message {messageClass}">
       {displayMessage}
