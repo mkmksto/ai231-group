@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+      BUCKET_NAME: ${BUCKET_NAME}
+      CREDENTIALS_FILE_BASE_64: ${CREDENTIALS_FILE_BASE_64}
+      GOOGLE_COMPUTE_ENDPOINT: ${GOOGLE_COMPUTE_ENDPOINT}
+      DATABASE_PATH: ${DATABASE_PATH}
+      FRONTEND_BASE_URL: ${FRONTEND_BASE_URL}
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    restart: always
+
+  compute_engine:
+    build:
+      context: ./compute_engine
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      BUCKET_NAME: ${BUCKET_NAME}
+      CREDENTIALS_FILE_BASE_64: ${CREDENTIALS_FILE_BASE_64}
+    restart: always

@@ -9,6 +9,7 @@ from typing import Dict
 
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, File, Request, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.staticfiles import StaticFiles
@@ -115,12 +116,24 @@ app = FastAPI(
 init_db()
 
 app.add_middleware(AuthMiddleware)
-
-app.mount(
-    "/assets",
-    StaticFiles(directory=str((BACKEND_DIST_PATH / "assets").resolve())),
-    name="assets",
+# Add CORS middleware for frontend dev servers
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:4173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
+
+# app.mount(
+#     "/assets",
+#     StaticFiles(directory=str((BACKEND_DIST_PATH / "assets").resolve())),
+#     name="assets",
+# )
 
 
 # Auth endpoints
@@ -336,12 +349,17 @@ async def predict_tumor_class(
         #     2: "no_tumor",
         #     3: "pituitary_tumor",
         # }
-        endpoint = f"{GOOGLE_COMPUTE_ENDPOINT}"
+        # endpoint = f"{GOOGLE_COMPUTE_ENDPOINT}"
+        print("before predict service")
+        # endpoint = "http://localhost:8001/predict/gcs"
+        endpoint = "http://compute_engine:8001/predict/gcs"
         response = requests.post(
             endpoint,
             json={"uri": new_image.s3_link},
             headers={"Accept": "application/json", "Content-Type": "application/json"},
         )
+        print("response: ", response)
+        print("after predict service")
         response_json = response.json()
         predicted_class = response_json.get("predicted_class", "prediction failed")
         confidence = response_json.get("confidence", 0.0)
@@ -400,8 +418,8 @@ async def health_check() -> Dict[str, str]:
     return {"status": "healthy", "version": "1.0.0"}
 
 
-app.mount(
-    "/",
-    StaticFiles(directory=str(BACKEND_DIST_PATH), html=True),
-    name="backend",
-)
+# app.mount(
+#     "/",
+#     StaticFiles(directory=str(BACKEND_DIST_PATH), html=True),
+#     name="backend",
+# )

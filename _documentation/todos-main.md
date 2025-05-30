@@ -10,3 +10,5 @@
 Final:
 
 - with CI/CD pipelines for retraining and redeploying but both are done manually by ML/SW Engineers, as it is assumed that these don't need to be done frequently anyway
+- conditional deployment of model and frontend/backend
+- ci/cd pipeline for building the frontend to the backend

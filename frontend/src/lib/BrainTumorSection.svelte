@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { sleep } from '../utils/utils';
+  // import { sleep } from '../utils/utils';
   import ImageUploader from './ImageUploader.svelte';
   import PredictionResult from './PredictionResult.svelte';
 // Adjusted path
@@ -54,7 +54,7 @@
         body: formData,
       });
 
-      await sleep(300); // Slightly shorter simulated delay
+      // await sleep(300); // Slightly shorter simulated delay
 
       if (!response.ok) {
         let errorMsg = `HTTP error! Status: ${response.status}`;
