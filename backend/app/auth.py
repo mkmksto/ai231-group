@@ -5,9 +5,8 @@ from typing import Optional
 from dotenv import load_dotenv
 from jose import JWTError, jwt
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
 
-from .db import User, get_db
+from .db import get_user_by_id
 
 load_dotenv()
 
@@ -115,7 +114,7 @@ def get_rt_payload(token: str):
         return invalid_rt_response
 
 
-def refresh_at_token(refresh_token: str, db: Session = next(get_db())):
+def refresh_at_token(refresh_token: str):
     print("...inside refresh_at_token")
     is_rt_valid, is_rt_expired, payload = get_rt_payload(refresh_token).values()
     print(
@@ -129,16 +128,16 @@ def refresh_at_token(refresh_token: str, db: Session = next(get_db())):
     if not is_rt_valid or is_rt_expired or not rt_payload:
         raise JWTError("Invalid refresh token")
 
-    db_user = db.query(User).filter(User.user_id == rt_payload.get("user_id")).first()
+    db_user = get_user_by_id(rt_payload.get("user_id"))
     if not db_user:
         raise JWTError("User not found")
 
     user = {
-        "user_id": db_user.user_id,
-        "name": db_user.name,
-        "role": db_user.role,
-        "email": db_user.email,
-        "google_id": db_user.google_id,
+        "user_id": db_user["user_id"],
+        "name": db_user["name"],
+        "role": db_user["role"],
+        "email": db_user["email"],
+        "google_id": db_user["google_id"],
     }
 
     return create_access_token(user)

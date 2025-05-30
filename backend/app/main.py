@@ -1,5 +1,6 @@
 import os
-import random
+
+# import random
 import sys
 import uuid
 from datetime import datetime
@@ -8,16 +9,24 @@ from pathlib import Path
 from typing import Dict
 
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, File, Request, UploadFile
+from fastapi import FastAPI, File, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer
-from fastapi.staticfiles import StaticFiles
+
+# from fastapi.staticfiles import StaticFiles
 from PIL import Image
-from sqlalchemy.orm import Session
 
 from .auth import TokenOrDbUserPayload
-from .db import ImageTable
+from .db import (
+    add_image,
+    add_user,
+    get_conn,
+    get_image,
+    get_user_by_email,
+    get_user_by_id,
+    init_db,
+)
 from .models import FeedbackInput
 from .storage import BUCKET_NAME, update_blob_metadata, upload_to_gcs
 
@@ -31,7 +40,6 @@ from .auth import (
     create_access_token,
     create_refresh_token,
 )
-from .db import User, get_db, init_db
 from .middleware import AuthMiddleware
 from .utils import BACKEND_DIST_PATH
 
@@ -159,7 +167,7 @@ async def logout():
 
 
 @app.get("/api/auth/google/callback")
-async def callback(code: str, db: Session = Depends(get_db)):
+async def callback(code: str):
     token_url = "https://accounts.google.com/o/oauth2/token"
     data = {
         "code": code,
@@ -179,76 +187,58 @@ async def callback(code: str, db: Session = Depends(get_db)):
     user_data = user_info.json()
 
     # Find or create user
-    print("finding or creating user")
-    try:
-        # Find or create user
-        print("finding user")
-        user = db.query(User).filter(User.google_id == user_data["id"]).first()
-        print("user: ", user)
-
-        # Create user if they don't exist
-        if not user:
-            print("no existing user found, creating new user")
-            user = User(
-                name=user_data["name"],
-                email=user_data["email"],
-                google_id=user_data["id"],
-                created_at=datetime.now(),
-            )
-            db.add(user)
-            db.commit()
-            db.refresh(user)
-
-        # Convert user to dict
-        user_dict = {
-            "user_id": user.user_id,
-            "name": user.name,
-            "role": user.role,
-            "email": user.email,
-            "google_id": user.google_id,
-        }
-
-        # create access and refresh tokens with user claims
-        access_token = create_access_token(user_dict)
-        refresh_token = create_refresh_token(user_dict)
-
-        # set the access tokens to the cookies (HTTP only)
-        response = RedirectResponse(FRONTEND_BASE_URL)
-        response.set_cookie(
-            key="access_token",
-            samesite="lax",
-            value=access_token,
-            path="/",
-            httponly=True,
-            max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+    print("finding user")
+    user = get_user_by_email(user_data["email"])
+    print("user: ", user)
+    if not user:
+        print("no existing user found, creating new user")
+        user = add_user(
+            name=user_data["name"], email=user_data["email"], google_id=user_data["id"]
         )
-        response.set_cookie(
-            key="refresh_token",
-            samesite="lax",
-            value=refresh_token,
-            path="/",
-            httponly=True,
-            max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
-        )
+        # user: Dict = get_user_by_email(user_data["email"])
+    user_dict = {
+        "user_id": user["user_id"],
+        "name": user["name"],
+        "role": user["role"],
+        "email": user["email"],
+        "google_id": user["google_id"],
+    }
 
-    except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={"message": f"Auth Error / Error in creating user: {str(e)}"},
-        )
+    # create access and refresh tokens with user claims
+    access_token = create_access_token(user_dict)
+    refresh_token = create_refresh_token(user_dict)
+
+    # set the access tokens to the cookies (HTTP only)
+    response = RedirectResponse(FRONTEND_BASE_URL or "")
+    response.set_cookie(
+        key="access_token",
+        samesite="lax",
+        value=access_token,
+        path="/",
+        httponly=True,
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+    )
+    response.set_cookie(
+        key="refresh_token",
+        samesite="lax",
+        value=refresh_token,
+        path="/",
+        httponly=True,
+        max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+    )
 
     return response
 
 
 @app.get("/api/me")
-async def me(request: Request, db: Session = Depends(get_db)):
+async def me(request: Request):
     print(">> .... inside /api/me")
     _user = request.state.user
     print("_user id: ", _user["user_id"])
     user = TokenOrDbUserPayload(**_user)
 
     # Get user from db after validating access token
-    db_user = db.query(User).filter(User.user_id == user.user_id).first()
+    db_user = get_user_by_id(user.user_id)
     if not db_user:
         return JSONResponse(
             status_code=404,
@@ -256,40 +246,43 @@ async def me(request: Request, db: Session = Depends(get_db)):
         )
 
     return {
-        "user_id": db_user.user_id,
-        "name": db_user.name,
-        "role": db_user.role,
-        "email": db_user.email,
-        "google_id": db_user.google_id,
+        "user_id": db_user["user_id"],
+        "name": db_user["name"],
+        "role": db_user["role"],
+        "email": db_user["email"],
+        "google_id": db_user["google_id"],
     }
 
 
 @app.post("/api/feedback")
 async def feedback(
     feedback_input: FeedbackInput,
-    db: Session = Depends(get_db),
 ):
     print("inside /api/feedback")
     print("image_id: ", feedback_input.image_id)
     print("label: ", feedback_input.label)
     try:
-        image = (
-            db.query(ImageTable)
-            .filter(ImageTable.image_id == feedback_input.image_id)
-            .first()
-        )
+        image = get_image(feedback_input.image_id)
         if not image:
             return JSONResponse(status_code=404, content={"message": "Image not found"})
 
         # Update database
-        setattr(image, "label", feedback_input.label)
-        setattr(image, "update_date", datetime.now())
-        db.commit()
-        db.refresh(image)
+        # from psycopg2 import sql
+
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """UPDATE images SET label = %s, update_date = %s WHERE image_id = %s""",
+                    (feedback_input.label, datetime.now(), feedback_input.image_id),
+                )
+            conn.commit()
+        image = get_image(feedback_input.image_id)
+        if not image:
+            return JSONResponse(status_code=404, content={"message": "Image not found"})
 
         # Update GCS metadata
         # Extract blob name from GCS path (remove gs://bucket-name/ prefix)
-        gcs_path = str(image.s3_link)
+        gcs_path = str(image["s3_link"])
         print("gcs_path: ", gcs_path)
         if gcs_path.startswith(f"gs://{BUCKET_NAME}/"):
             blob_name = gcs_path[len(f"gs://{BUCKET_NAME}/") :]
@@ -313,7 +306,7 @@ async def feedback(
 
 @app.post("/api/predict")
 async def predict_tumor_class(
-    file: UploadFile = File(...), db: Session = Depends(get_db)
+    file: UploadFile = File(...),
 ):
     print("---- inside /api/predict")
     try:
@@ -330,17 +323,18 @@ async def predict_tumor_class(
             source_file_path=temp_path,
             destination_blob_name=destination_blob_name,
         )
-        new_image = ImageTable(
-            image_id=str(uuid.uuid4()),
+        image_id = str(uuid.uuid4())
+        add_image(
+            image_id=image_id,
             s3_link=gcs_path,
             upload_date=datetime.now(),
             update_date=datetime.now(),
             label="",
             img_type="feedback",
         )
-        db.add(new_image)
-        db.commit()
-        db.refresh(new_image)
+        new_image = get_image(image_id)
+        if not new_image:
+            return JSONResponse(status_code=404, content={"message": "Image not found"})
         # print("new_image id: ", new_image.image_id)
 
         # class_mapping = {
@@ -355,7 +349,7 @@ async def predict_tumor_class(
         endpoint = "http://compute_engine:8001/predict/gcs"
         response = requests.post(
             endpoint,
-            json={"uri": new_image.s3_link},
+            json={"uri": new_image["s3_link"]},
             headers={"Accept": "application/json", "Content-Type": "application/json"},
         )
         print("response: ", response)
@@ -371,7 +365,7 @@ async def predict_tumor_class(
             {
                 "prediction": predicted_class,
                 "confidence": confidence,  # Actual confidence score from model
-                "image_id": new_image.image_id,
+                "image_id": new_image["image_id"],
             }
         )
 
