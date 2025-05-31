@@ -49,14 +49,14 @@
 <style>
   .navbar {
     position: fixed;
-    top: 40px; /* Adjusted down for the new title */
+    top: 50px;
     left: 0;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between; /* Space out logo, links, menu button */
     padding: 0.5rem 1.5rem;
-    background-color: #007AFF; /* Medical blue */
+    background-color: transparent;
     color: white;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     z-index: 1100; /* Above dashboard content */
@@ -73,24 +73,33 @@
 
   .nav-link {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0.6rem; /* Slightly increased gap */
-    padding: 0.5rem 0.7rem; /* Adjusted padding */
+    justify-content: center;
+    gap: 0.3rem;
+    width: 8.5rem;
+    height: 3.5rem;
+    min-width: 7rem;
+    max-width: 10rem;
+    min-height: 3rem;
+    max-height: 4rem;
     color: white;
     text-decoration: none;
     background: none;
     border: none;
     cursor: pointer;
     border-radius: 6px;
-    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Added shadow transition */
-    font-size: 0.9rem; /* Slightly smaller font */
-
-    /* Emboss Effect */
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    font-size: clamp(0.7rem, 0.9vw, 1rem);
+    font-family: inherit;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 0.5rem;
     border: 1px solid rgba(0, 0, 0, 0.1);
     box-shadow: 
-        inset 1px 1px 1px rgba(255, 255, 255, 0.5), /* Inner highlight */
-        inset -1px -1px 1px rgba(0, 0, 0, 0.1),  /* Inner shadow */
-        1px 1px 2px rgba(0, 0, 0, 0.2);        /* Outer shadow */
+        inset 1px 1px 1px rgba(255, 255, 255, 0.5),
+        inset -1px -1px 1px rgba(0, 0, 0, 0.1),
+        1px 1px 2px rgba(0, 0, 0, 0.2);
   }
 
   .nav-link:hover {
@@ -112,7 +121,16 @@
   }
 
   .link-text {
-      /* Hide text on smaller screens if needed, handled via media query */
+    width: 100%;
+    text-align: center;
+    font-size: inherit;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    font-family: inherit;
+    word-break: break-word;
+    white-space: normal;
+    line-height: 1.1;
   }
 
   .mobile-menu-button {

@@ -22,7 +22,7 @@
   .dashboard-section {
     width: 100%;
     margin-bottom: 1rem; /* Space between sections */
-    background-color: #F9FBFC; /* Light background */
+    background-color: rgba(249,251,252,0.02); /* Slightly transparent */
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     overflow: hidden; /* Contain children */
@@ -56,7 +56,7 @@
   .section-content {
     padding: 1.5rem;
     color: #37474F; /* Dark grey text */
-    background-color: white; /* Pure white content area */
+    background-color: rgba(255,255,255,0.85); /* Slightly transparent */
   }
 
   /* Fallback content styling */

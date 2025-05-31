@@ -111,7 +111,10 @@
 
 <div class="app-container">
   <AnimatedBackground /> <!-- <-- Render background component -->
-  <h1 class="app-title">DiagnosTech-AI</h1> 
+  <div class="app-header">
+    <img src="/logo.png" alt="DiagnosTech-AI Logo" class="app-logo" />
+    <h1 class="app-title">DiagnosTech-AI</h1>
+  </div>
   <NavBar {navItems} {activeSection} on:navclick={handleNavClick} /> 
 
   <main class="dashboard-content">
@@ -163,23 +166,35 @@
     color: #1A237E; /* Dark indigo */
   }
 
-  .app-title {
+  .app-header {
     position: fixed;
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    margin: 0;
-    padding: 0.5rem 0;
-    font-size: 1.5rem; /* Adjust size as needed */
-    color: #007AFF; /* Match navbar blue */
-    width: 100%;
-    text-align: center;
-    background-color: rgba(10, 25, 47, 0.85); /* Dark blue semi-transparent */
+    display: flex;
+    align-items: center;
+    z-index: 1300;
+    background-color: rgba(10, 25, 47, 0.85);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
-    z-index: 1300; /* Highest z-index */
+    width: 100%;
+    justify-content: center;
+    padding: 0.5rem 0;
+  }
+  .app-logo {
+    height: 2.2rem;
+    margin-right: 0.7rem;
+    margin-left: 0.5rem;
+  }
+  .app-title {
+    margin: 0;
+    font-size: 1.5rem;
     font-weight: 600;
-    color: #ccd6f6; /* Lighter text color for dark bg */
+    color: #ccd6f6;
+    background: none;
+    box-shadow: none;
+    position: static;
+    padding: 0;
   }
 
   .app-container {
@@ -189,7 +204,7 @@
   }
 
   .dashboard-content {
-    padding-top: 100px; 
+    padding-top: 70px;
     padding-bottom: 100px;
     max-width: 1100px;
     margin: 0 auto;

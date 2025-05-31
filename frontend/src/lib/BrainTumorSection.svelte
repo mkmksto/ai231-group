@@ -209,7 +209,10 @@
 
 <style>
   .brain-tumor-classifier {
-    /* Add specific styles if needed, or rely on App.svelte */
+    background: rgba(251, 249, 249, 0); /* Fully transparent */
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 2rem 1.5rem;
   }
   .description {
       margin-bottom: 1.5rem;
@@ -220,14 +223,15 @@
   .uploader-container {
       margin-bottom: 2rem;
       padding: 1rem;
-      background-color: #ECEFF1; /* Light grey background for uploader */
+      background-color: rgba(236, 239, 241, 0.15); /* Light grey with 25% opacity */
       border-radius: 8px;
   }
   .results-container {
       margin-top: 1.5rem;
-      border: 1px solid #CFD8DC;
+      border: 1px solid #0fa0de;
       border-radius: 8px;
       padding: 1.5rem;
+      background: rgba(255,255,255,0.18); /* White with 18% opacity */
   }
 
   .confirmation-area {

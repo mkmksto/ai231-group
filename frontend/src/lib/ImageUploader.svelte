@@ -118,6 +118,7 @@
     border: 2px dashed #ccc;
     border-radius: 8px;
     transition: all 0.3s ease;
+    background: rgba(255,255,255,0.18); /* White with 18% opacity */
   }
 
   .dragging {
@@ -128,7 +129,7 @@
   .file-label {
     display: inline-block;
     padding: 0.8rem 1.5rem;
-    background-color: #007bff;
+    background-color: #1877f2; /* Facebook blue */
     color: white;
     border: none;
     border-radius: 5px;
@@ -138,7 +139,7 @@
   }
 
   .file-label:hover {
-    background-color: #0056b3;
+    background-color: #145db2; /* Slightly darker Facebook blue */
   }
 
   /* Hide the actual file input */
