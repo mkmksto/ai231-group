@@ -31,7 +31,7 @@ jobs:
 
       - name: Run backend unit tests
         run: |
-          pytest -s backend/tests/unit_tests.py
+          pytest -s backend/unit_tests.py
 
       - name: Install compute_engine dependencies
         run: |
