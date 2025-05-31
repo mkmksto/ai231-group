@@ -1,10 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from gcs_bucket import load_image_from_gcs
+from inference import BrainTumorClassifier
 from PIL import Image
 from pydantic import BaseModel
-
-from app.inference import BrainTumorClassifier
 
 app = FastAPI()
 app.add_middleware(
