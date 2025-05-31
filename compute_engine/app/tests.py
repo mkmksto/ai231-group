@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 import torch
 from PIL import Image
@@ -7,7 +9,8 @@ from .transforms import val_transform
 
 # Dummy ONNX path for instantiation test (should be replaced with a real or mock model for real tests)
 # DUMMY_ONNX_PATH = "app/brain_tumor_classifier.onnx"
-DUMMY_ONNX_PATH = "brain_tumor_classifier.onnx"
+PARENT_DIR = Path(__file__).parent
+DUMMY_ONNX_PATH = PARENT_DIR / "brain_tumor_classifier.onnx"
 
 
 def test_val_transform_output_type():
@@ -23,7 +26,7 @@ def test_val_transform_output_type():
 def test_classifier_instantiation_and_error():
     print("\nTesting classifier instantiation and error handling...")
     # Should not raise on instantiation
-    model = BrainTumorClassifier(DUMMY_ONNX_PATH)
+    model = BrainTumorClassifier(DUMMY_ONNX_PATH.resolve())
     # Should return error dict on bad input
     result = model.predict(None)  # type: ignore  # intentionally passing None to test error handling
     assert isinstance(result, dict)
