@@ -4,7 +4,7 @@ import numpy as np
 import onnxruntime as ort
 from PIL import Image
 
-from .transforms import val_transform
+from app.transforms import val_transform
 
 
 class BrainTumorClassifier:
