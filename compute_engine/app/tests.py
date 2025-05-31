@@ -4,8 +4,8 @@ import numpy as np
 import torch
 from PIL import Image
 
-from app.inference import BrainTumorClassifier
-from app.transforms import val_transform
+from .inference import BrainTumorClassifier
+from .transforms import val_transform
 
 # Dummy ONNX path for instantiation test (should be replaced with a real or mock model for real tests)
 # DUMMY_ONNX_PATH = "app/brain_tumor_classifier.onnx"

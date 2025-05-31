@@ -1,9 +1,12 @@
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from gcs_bucket import load_image_from_gcs
-from inference import BrainTumorClassifier
 from PIL import Image
 from pydantic import BaseModel
+
+from .gcs_bucket import load_image_from_gcs
+from .inference import BrainTumorClassifier
 
 app = FastAPI()
 app.add_middleware(
@@ -13,7 +16,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-model = BrainTumorClassifier("brain_tumor_classifier.onnx")
+PARENT_DIR = Path(__file__).parent
+ONNX_PATH = PARENT_DIR / "brain_tumor_classifier.onnx"
+print("ONNX_PATH: ", ONNX_PATH)
+model = BrainTumorClassifier(ONNX_PATH)
 
 
 class GCSRequest(BaseModel):
