@@ -1,6 +1,4 @@
 import os
-
-# import random
 import sys
 import uuid
 from datetime import datetime
@@ -41,20 +39,11 @@ from .auth import (
     create_refresh_token,
 )
 from .middleware import AuthMiddleware
-from .utils import BACKEND_DIST_PATH
 
-# ML Imports
-# from numpy import ndarray
-# import torch
-# import torch.nn.functional as F
-# from training.inference_engine.tensor_rt_inference import BrainTumorClassifier
+# from .utils import BACKEND_DIST_PATH
 
 # For ML inference (uncomment when using the actual model)
 root_dir = Path(__file__).parent.parent.parent
-# print("root_dir: ", root_dir)
-# sample_test_image = "training/brain_tumor_dataset/Testing/glioma_tumor/image(1).jpg"
-# image_path = Path(root_dir / sample_test_image)
-# image = Image.open(image_path).convert("RGB")
 
 # OS-specific engine paths
 linux_engine = "training/inference_engine/brain_tumor_linux.engine"
