@@ -3,12 +3,12 @@ name: Run Backend Unit Tests
 on:
   push:
     branches: [main, dev]
-    paths:
-      - "backend/**/*.py"
+    # paths:
+    #   - "backend/**/*.py"
   pull_request:
     branches: [main, dev]
-    paths:
-      - "backend/**/*.py"
+    # paths:
+    #   - "backend/**/*.py"
 
 jobs:
   test:
