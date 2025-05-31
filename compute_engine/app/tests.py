@@ -37,7 +37,7 @@ def test_classifier_instantiation_and_error():
 
 def test_predict_output_keys():
     print("\nTesting predict method output structure...")
-    model = BrainTumorClassifier(DUMMY_ONNX_PATH)
+    model = BrainTumorClassifier(DUMMY_ONNX_PATH.resolve())
     img = Image.fromarray(np.uint8(np.random.rand(256, 256, 3) * 255))
     result = model.predict(img)
     assert isinstance(result, dict)
