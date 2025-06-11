@@ -9,6 +9,6 @@ export default defineConfig({
       // "/api": "http://localhost:8000",
       "/api": "http://backend:8002",
     },
-    allowedHosts: ["231group.207.148.67.31.sslip.io"],
+    allowedHosts: ["231group.207.148.67.31.sslip.io", "diag.miketest.site"],
   },
 });
