@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       // "/api": "http://localhost:8000",
-      "/api": "http://backend:8000",
+      "/api": "http://backend:8002",
     },
     allowedHosts: ["231group.207.148.67.31.sslip.io"],
   },
