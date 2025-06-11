@@ -148,6 +148,20 @@
     user={currentUser} 
     on:logout={handleLogout}
   />
+
+  {#if !currentUser}
+    <div class="landing-bg">
+      <div class="landing-overlay"></div>
+      <div class="landing-content">
+        <img src="/logo.png" alt="DiagnosTech-AI Logo" class="landing-logo" />
+        <h1 class="landing-title">DiagnosTech-AI</h1>
+        <p class="landing-tagline">Empowering doctors with AI-driven diagnostics</p>
+        <button class="google-login-btn" on:click={() => window.location.href = '/api/auth/google/login'}>
+          Continue with Google
+        </button>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -246,4 +260,66 @@
         color: #0056b3;
     }
 
+  .landing-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url('/DiagnosTech-AI.png') center center/cover no-repeat;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .landing-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(10, 25, 47, 0.55);
+    z-index: 1;
+  }
+  .landing-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #ccd6f6;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .landing-logo {
+    height: 4rem;
+    margin-bottom: 1.2rem;
+  }
+  .landing-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.7rem;
+    color: #fff;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.25);
+  }
+  .landing-tagline {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: #e3eafc;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.18);
+  }
+  .google-login-btn {
+    background: #1877f2;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.9rem 2.2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    transition: background 0.2s;
+  }
+  .google-login-btn:hover {
+    background: #145db2;
+  }
 </style>

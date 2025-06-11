@@ -48,7 +48,7 @@
 
 <style>
   .navbar {
-    position: fixed;
+    position: center;
     top: 50px;
     left: 0;
     width: 100%;
