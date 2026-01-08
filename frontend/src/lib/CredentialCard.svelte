@@ -22,6 +22,37 @@
     isSampleMode = !isSampleMode;
     sampleMode.set(isSampleMode);
   }
+
+  function censorName(name: string): string {
+    if (!name) return '';
+    return name
+      .split(' ')
+      .map(word => {
+        if (word.length === 0) return '';
+        if (word.length === 1) return word;
+        return word[0] + '*'.repeat(Math.min(word.length - 1, 3));
+      })
+      .join(' ');
+  }
+
+  function censorEmail(email: string): string {
+    if (!email) return '';
+    const [localPart, domain] = email.split('@');
+    if (!domain) return email; // Invalid email format
+    
+    const censoredLocal = localPart.length > 0 
+      ? localPart[0] + '*'.repeat(Math.min(localPart.length - 1, 3))
+      : '';
+    
+    const [domainName, ...tldParts] = domain.split('.');
+    const censoredDomain = domainName.length > 0
+      ? domainName[0] + '*'.repeat(Math.min(domainName.length - 1, 3))
+      : '';
+    
+    const tld = tldParts.join('.');
+    return `${censoredLocal}@${censoredDomain}${tld ? '.' + tld : ''}`;
+  }
+
   // let email = '';
   // let password = '';
   // let name = '';
@@ -80,11 +111,11 @@
     <div class="user-info">
       <div class="info-item">
         <User size={20} />
-        <span>{user.name}</span>
+        <span>{censorName(user.name)}</span>
       </div>
       <div class="info-item">
         <Envelope size={20} />
-        <span>{user.email}</span>
+        <span>{censorEmail(user.email)}</span>
       </div>
       <div class="info-item">
         <ShieldCheck size={20} />
