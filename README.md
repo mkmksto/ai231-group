@@ -1,7 +1,3 @@
-# Current Prod demo URL
-
-http://231group.207.148.67.31.sslip.io/
-
 # Backend
 
 Students: Joshua Cantor, Ely Pates, Michael Quinto
