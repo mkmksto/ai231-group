@@ -4,6 +4,7 @@
   import PredictionResult from './PredictionResult.svelte';
 // Adjusted path
   import { createEventDispatcher } from 'svelte';
+  import { sampleMode } from '../utils/sampleMode';
 
   // State variables internal to this component
   let currentPrediction: string | null = null;
@@ -47,9 +48,13 @@
     const formData = new FormData();
     formData.append('file', file);
 
+    // Check if sample mode is enabled
+    const isSample = $sampleMode;
+    const url = isSample ? '/api/predict?sample=true' : '/api/predict';
+
     try {
       // Using the same API endpoint as before
-      const response = await fetch('/api/predict', {
+      const response = await fetch(url, {
         method: 'POST',
         body: formData,
       });

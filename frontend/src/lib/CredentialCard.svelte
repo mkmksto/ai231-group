@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Envelope, IdentificationCard, ShieldCheck, SignOut, User } from 'phosphor-svelte';
   import { createEventDispatcher } from 'svelte';
+  import { sampleMode } from '../utils/sampleMode';
 
   // Define the User type matching App.svelte
   interface User {
@@ -15,6 +16,12 @@
 
   // Internal state for login/register form
   let isRegisterMode = false;
+  let isSampleMode = false;
+
+  function toggleSampleMode() {
+    isSampleMode = !isSampleMode;
+    sampleMode.set(isSampleMode);
+  }
   // let email = '';
   // let password = '';
   // let name = '';
@@ -90,6 +97,10 @@
           <span class="credentials" title={user.credentials}>{user.credentials}</span>
         </div>
       {/if}
+      <label class="sample-checkbox">
+        <input type="checkbox" checked={isSampleMode} on:change={toggleSampleMode} />
+        <span>Sample</span>
+      </label>
     </div>
     <button class="logout-button" on:click={handleLogout} title="Logout">
       <SignOut size={20} />
@@ -171,6 +182,28 @@
     background-color: #f5f5f5;
     padding: 0.5rem 1rem;
     border-radius: 15px;
+  }
+
+  .sample-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #666;
+    background-color: #f5f5f5;
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .sample-checkbox input[type="checkbox"] {
+    cursor: pointer;
+    margin: 0;
+  }
+
+  .sample-checkbox span {
+    user-select: none;
   }
 
   .credentials {

@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Dict
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, Request, UploadFile
+from fastapi import FastAPI, File, Query, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer
@@ -297,8 +297,54 @@ async def feedback(
 @app.post("/api/predict")
 async def predict_tumor_class(
     file: UploadFile = File(...),
+    sample: bool = Query(False, description="Enable sample mode to return dummy data"),
 ):
     print("---- inside /api/predict")
+    print(f"Sample mode: {sample}")
+
+    # If sample mode is enabled, return dummy data
+    if sample:
+        import random
+
+        # Hardcoded class - change this to whatever class you want to return
+        DUMMY_CLASS = "glioma_tumor"  # Options: "glioma_tumor", "meningioma_tumor", "no_tumor", "pituitary_tumor"
+        # Random confidence between 80-100 (0.80-1.00)
+        dummy_confidence = random.uniform(0.80, 1.00)
+
+        # Still save the image to database for consistency
+        contents = await file.read()
+        image_from_frontend = Image.open(BytesIO(contents)).convert("RGB")
+        temp_path = f"/tmp/{file.filename}"
+        image_from_frontend.save(temp_path)
+
+        destination_blob_name = (
+            f"uploads/{datetime.now().strftime('%Y%m%d_%H%M%S')}_{file.filename}"
+        )
+        # gcs_path = upload_to_gcs(
+        #     source_file_path=temp_path,
+        #     destination_blob_name=destination_blob_name,
+        # )
+        image_id = str(uuid.uuid4())
+        # add_image(
+        #     image_id=image_id,
+        #     s3_link=gcs_path,
+        #     upload_date=datetime.now(),
+        #     update_date=datetime.now(),
+        #     label="",
+        #     img_type="feedback",
+        # )
+        # new_image = get_image(image_id)
+        # if not new_image:
+        #     return JSONResponse(status_code=404, content={"message": "Image not found"})
+
+        return JSONResponse(
+            {
+                "prediction": DUMMY_CLASS,
+                "confidence": dummy_confidence,
+                # "image_id": new_image["image_id"],
+            }
+        )
+
     try:
         contents = await file.read()
         image_from_frontend = Image.open(BytesIO(contents)).convert("RGB")
