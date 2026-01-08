@@ -185,6 +185,7 @@ async def callback(code: str):
             name=user_data["name"], email=user_data["email"], google_id=user_data["id"]
         )
         # user: Dict = get_user_by_email(user_data["email"])
+    print("user: ", user)
     user_dict = {
         "user_id": user["user_id"],
         "name": user["name"],
