@@ -134,36 +134,30 @@
 <style>
   .credential-card {
     position: fixed;
-    bottom: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 500px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.8rem 1.2rem;
-    border-radius: 12px;
-    background-color: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(10px) saturate(180%);
-    -webkit-backdrop-filter: blur(10px) saturate(180%);
-    border: 2px solid #007AFF;
-    box-shadow: 0 4px 15px rgba(0, 122, 255, 0.2);
+    padding: 1rem 2rem;
+    background-color: #ffffff;
+    border-top: 1px solid #e5e5e5;
     z-index: 1200;
-    color: #0056b3;
-    transition: all 0.3s ease;
+    color: #1a1a1a;
+    transition: all 0.2s ease;
   }
 
-  /* Logged In Specific Styles */
   .credential-card.logged-in {
-      /* Inherits base styles, potentially add specific adjustments */
+    /* Inherits base styles */
   }
 
   .user-info {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-    flex-wrap: nowrap;
+    gap: 2rem;
+    flex-wrap: wrap;
     overflow: hidden;
   }
 
@@ -171,153 +165,182 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     white-space: nowrap;
+    color: #666;
+    background-color: #f5f5f5;
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
   }
 
   .credentials {
-      max-width: 150px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      display: inline-block;
-      vertical-align: middle;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
   }
 
   .logout-button {
-    background: none;
+    background-color: #f5f5f5;
     border: none;
-    color: #007AFF;
+    color: #1a1a1a;
     cursor: pointer;
-    padding: 0.3rem;
+    padding: 0.5rem 1rem;
     display: flex;
     align-items: center;
-    border-radius: 50%;
-    transition: background-color 0.2s ease;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    border-radius: 10px;
   }
 
   .logout-button:hover {
-    background-color: rgba(0, 122, 255, 0.1);
+    background-color: #e5e5e5;
   }
 
-  /* Logged Out Specific Styles */
   .credential-card.logged-out {
-      max-width: 400px; /* Slightly smaller for form */
-      padding: 1.5rem; /* More padding for form */
-      justify-content: center; /* Center the form */
+    max-width: 100%;
+    padding: 1.5rem 2rem;
+    justify-content: center;
   }
 
   .auth-form {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
   }
 
   .auth-form h4 {
-      margin: 0 0 1rem 0;
-      text-align: center;
-      color: #0056b3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
+    margin: 0 0 1rem 0;
+    text-align: center;
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 500;
   }
 
   .form-group {
-      display: flex;
-      flex-direction: column; /* Labels on top */
-      gap: 0.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .form-group label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #333;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .form-group input {
-      padding: 0.6rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      background-color: rgba(255, 255, 255, 0.8);
+    padding: 0.75rem;
+    border: 1px solid #e5e5e5;
+    border-radius: 0;
+    font-size: 0.9375rem;
+    background-color: #ffffff;
+    font-family: inherit;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: #1a1a1a;
   }
 
   .form-actions {
-      margin-top: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
   }
 
   .submit-button {
-      padding: 0.8rem;
-      border: none;
-      border-radius: 6px;
-      color: white;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
+    padding: 0.875rem 2rem;
+    border: 1px solid #000000;
+    border-radius: 0;
+    color: #ffffff;
+    background-color: #000000;
+    font-size: 1rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    letter-spacing: -0.01em;
   }
 
   .submit-button.login {
-      background-color: #007AFF;
-  }
-  .submit-button.login:hover {
-      background-color: #0056b3;
+    background-color: #000000;
+    color: #ffffff;
   }
 
-   .submit-button.register {
-      background-color: #28a745; /* Green for register */
+  .submit-button.login:hover {
+    background-color: #ffffff;
+    color: #000000;
   }
-   .submit-button.register:hover {
-      background-color: #218838;
+
+  .submit-button.register {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  .submit-button.register:hover {
+    background-color: #ffffff;
+    color: #000000;
   }
 
   .toggle-button {
-      background: none;
-      border: none;
-      color: #007AFF;
-      text-decoration: underline;
-      cursor: pointer;
-      font-size: 0.85rem;
-      padding: 0.3rem;
-  }
-  .toggle-button:hover {
-      color: #0056b3;
+    background: none;
+    border: none;
+    color: #666;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 0.5rem 0;
+    margin-top: 0.5rem;
   }
 
-  /* Responsive adjustments */
-  @media (max-width: 600px) {
-    /* Logged In */
+  .toggle-button:hover {
+    color: #1a1a1a;
+  }
+
+  @media (max-width: 768px) {
+    .credential-card {
+      padding: 1rem;
+    }
+
     .credential-card.logged-in {
-       width: 95%;
-       padding: 0.6rem 1rem;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
     }
+
     .user-info {
-        gap: 0.8rem;
+      gap: 1rem;
+      width: 100%;
     }
+
     .info-item {
-        font-size: 0.8rem;
-        gap: 0.3rem;
+      font-size: 0.8125rem;
     }
+
     .credentials {
-        max-width: 100px;
+      max-width: 150px;
     }
-    
-    /* Logged Out */
-     .credential-card.logged-out {
-       width: 90%;
-       max-width: none;
-       padding: 1.2rem;
-     }
-     .auth-form h4 {
-         font-size: 1.1rem;
-     }
+
+    .logout-button {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .credential-card.logged-out {
+      padding: 1.5rem 1rem;
+    }
   }
 </style> 

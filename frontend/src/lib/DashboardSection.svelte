@@ -1,18 +1,11 @@
 <script lang="ts">
   export let title: string;
   export let sectionId: string;
-  export let icon: any; // SvelteComponent type would be better with more setup
+  export let icon: any;
 
 </script>
 
 <section class="dashboard-section" id={sectionId}>
-  <div class="section-header">
-    <div class="header-content">
-      <svelte:component this={icon} weight="duotone" size="28" />
-      <h2>{title}</h2>
-    </div>
-  </div>
-
   <div class="section-content">
     <slot>Fallback content if no slot is provided.</slot>
   </div>
@@ -21,48 +14,26 @@
 <style>
   .dashboard-section {
     width: 100%;
-    margin-bottom: 1rem; /* Space between sections */
-    background-color: rgba(249,251,252,0.02); /* Slightly transparent */
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    overflow: hidden; /* Contain children */
-  }
-
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 1rem 1.5rem;
-    background: linear-gradient(135deg, #b3e5fc 0%, #81d4fa 100%); /* Brighter blue gradient */
+    margin-bottom: 0;
+    background-color: transparent;
     border: none;
-    border-bottom: 1px solid #CFD8DC; /* Subtle separator */
-    text-align: left;
-    box-sizing: border-box;
-  }
-
-  .header-content {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .section-header h2 {
-    margin: 0;
-    font-size: 1.4rem;
-    color: #01579b; /* Darker blue */
+    overflow: visible;
   }
 
   .section-content {
-    padding: 1.5rem;
-    color: #37474F; /* Dark grey text */
-    background-color: rgba(255,255,255,0.85); /* Slightly transparent */
+    padding: 0;
+    color: #1a1a1a;
+    background-color: transparent;
   }
 
-  /* Fallback content styling */
   .section-content > :global(p):first-child:last-child {
-      color: #78909C;
-      font-style: italic;
+    color: #666;
+    font-style: normal;
   }
 
+  @media (max-width: 768px) {
+    .section-content {
+      padding: 2rem 1.5rem;
+    }
+  }
 </style> 

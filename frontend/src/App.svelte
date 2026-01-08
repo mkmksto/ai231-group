@@ -1,23 +1,13 @@
 <script lang="ts">
-  import { Bandaids, Bone, Brain, Dna, Eye, Heartbeat, Stethoscope, Virus } from 'phosphor-svelte';
+  import { Brain } from 'phosphor-svelte';
   import BrainTumorSection from './lib/BrainTumorSection.svelte';
   import CredentialCard from './lib/CredentialCard.svelte';
   import DashboardSection from './lib/DashboardSection.svelte';
   import NavBar from './lib/NavBar.svelte';
-// Icons for sections
-  import AnimatedBackground from './lib/AnimatedBackground.svelte'; // <-- Import background
 
   // --- Navigation --- 
   const navItems = [
-    { name: "Brain Tumor Classifier", id: "brain-neuro", icon: Brain }, // Renamed for clarity
-    { name: "Cancer Diagnostics", id: "cancer", icon: Bandaids },
-    { name: "Cardiology AI", id: "cardio", icon: Heartbeat },
-    { name: "Respiratory Analysis", id: "respiratory", icon: Stethoscope },
-    { name: "Ophthalmology Insights", id: "ophthalmology", icon: Eye },
-    { name: "Gastroenterology Tools", id: "gastro", icon: Bandaids },
-    { name: "Infectious Disease AI", id: "infectious", icon: Virus },
-    { name: "Genetic Sequencing AI", id: "genetic", icon: Dna },
-    { name: "Radiology Assistant", id: "radiology", icon: Bone },
+    { name: "Brain Tumor Classifier", id: "brain-neuro", icon: Brain },
   ];
 
   let activeSection: string | null = navItems[0].id; // Default to first section
@@ -110,9 +100,7 @@
 </script>
 
 <div class="app-container">
-  <AnimatedBackground /> <!-- <-- Render background component -->
   <div class="app-header">
-    <img src="/logo.png" alt="DiagnosTech-AI Logo" class="app-logo" />
     <h1 class="app-title">DiagnosTech-AI</h1>
   </div>
   <NavBar {navItems} {activeSection} on:navclick={handleNavClick} /> 
@@ -151,13 +139,11 @@
 
   {#if !currentUser}
     <div class="landing-bg">
-      <div class="landing-overlay"></div>
       <div class="landing-content">
-        <img src="/logo.png" alt="DiagnosTech-AI Logo" class="landing-logo" />
         <h1 class="landing-title">DiagnosTech-AI</h1>
         <p class="landing-tagline">Empowering doctors with AI-driven diagnostics</p>
         <button class="google-login-btn" on:click={() => window.location.href = '/api/auth/google/login'}>
-          Continue with Google
+          Continue with Google →
         </button>
       </div>
     </div>
@@ -168,158 +154,158 @@
   /* --- Global Styles / Resets --- */
   :global(body) {
     margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern sans-serif */
-    color: #333;
-    overflow-x: hidden; /* Prevent horizontal scrollbars potentially caused by fixed elements */
-    min-height: 100vh; 
-    /* Background is now handled by the AnimatedBackground component */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    color: #1a1a1a;
+    overflow-x: hidden;
+    min-height: 100vh;
+    background-color: #ffffff;
   }
 
   :global(h1, h2, h3, h4, h5, h6) {
-    font-family: 'Roboto', sans-serif; /* Optional: Different font for headers */
-    color: #1A237E; /* Dark indigo */
+    font-family: inherit;
+    color: #1a1a1a;
+    font-weight: 500;
+    letter-spacing: -0.02em;
   }
 
   .app-header {
     position: fixed;
     top: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
     display: flex;
     align-items: center;
-    z-index: 1300;
-    background-color: rgba(10, 25, 47, 0.85);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    width: 100%;
     justify-content: center;
-    padding: 0.5rem 0;
+    z-index: 1000;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e5e5;
+    width: 100%;
+    padding: 1.5rem 0;
   }
-  .app-logo {
-    height: 2.2rem;
-    margin-right: 0.7rem;
-    margin-left: 0.5rem;
-  }
+
   .app-title {
     margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #ccd6f6;
-    background: none;
-    box-shadow: none;
-    position: static;
-    padding: 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    letter-spacing: -0.01em;
   }
 
   .app-container {
     display: flex;
     flex-direction: column;
-    position: relative; /* Ensure z-index stacking context */
+    position: relative;
+    min-height: 100vh;
+    background-color: #ffffff;
   }
 
   .dashboard-content {
-    padding-top: 70px;
-    padding-bottom: 100px;
-    max-width: 1100px;
+    padding-top: 100px;
+    padding-bottom: 120px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
     width: 100%;
     box-sizing: border-box;
-    overflow-y: auto;
-    height: calc(100vh - 100px - 100px); /* Adjust if CredentialCard height changes */
-    position: relative; /* Ensure content stays above background */
-    z-index: 10;
   }
 
   .placeholder-content {
-    padding: 2rem;
+    padding: 3rem 2rem;
     text-align: center;
-    background-color: #f5f7fa;
-    border-radius: 6px;
-    border: 1px dashed #ccc;
-    color: #6c757d;
+    background-color: #fafafa;
+    border-radius: 0;
+    border: 1px solid #e5e5e5;
+    color: #666;
   }
 
   .placeholder-content p {
-      margin-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 
-   /* Basic styling for potential AI use case cards */
-   .ai-use-case-card {
-      background-color: white;
-      padding: 1rem;
-      border-radius: 6px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-      margin-top: 1rem;
-      border-left: 4px solid #007AFF;
-      text-align: left;
-   }
-    .ai-use-case-card h4 {
-        margin-top: 0;
-        color: #0056b3;
-    }
+  .ai-use-case-card {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 0;
+    box-shadow: none;
+    margin-top: 1rem;
+    border: 1px solid #e5e5e5;
+    text-align: left;
+  }
+
+  .ai-use-case-card h4 {
+    margin-top: 0;
+    color: #1a1a1a;
+  }
 
   .landing-bg {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     width: 100vw;
     height: 100vh;
-    background: url('/DiagnosTech-AI.png') center center/cover no-repeat;
+    background-color: #ffffff;
     z-index: 2000;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  .landing-overlay {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(10, 25, 47, 0.55);
-    z-index: 1;
-  }
+
   .landing-content {
-    position: relative;
-    z-index: 2;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: #ccd6f6;
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
     margin: 0 auto;
+    padding: 2rem;
   }
-  .landing-logo {
-    height: 4rem;
-    margin-bottom: 1.2rem;
-  }
+
   .landing-title {
     font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 0.7rem;
-    color: #fff;
-    text-shadow: 0 2px 16px rgba(0,0,0,0.25);
+    font-weight: 500;
+    margin-bottom: 1rem;
+    color: #1a1a1a;
+    letter-spacing: -0.03em;
   }
+
   .landing-tagline {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-    color: #e3eafc;
-    text-shadow: 0 1px 8px rgba(0,0,0,0.18);
+    font-size: 1rem;
+    margin-bottom: 3rem;
+    color: #666;
+    font-weight: 400;
   }
+
   .google-login-btn {
-    background: #1877f2;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 0.9rem 2.2rem;
-    font-size: 1.1rem;
-    font-weight: 600;
+    background: #000000;
+    color: #ffffff;
+    border: 1px solid #000000;
+    border-radius: 0;
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+    font-weight: 400;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-    transition: background 0.2s;
+    transition: all 0.2s ease;
+    letter-spacing: -0.01em;
   }
+
   .google-login-btn:hover {
-    background: #145db2;
+    background: #ffffff;
+    color: #000000;
+  }
+
+  @media (max-width: 768px) {
+    .dashboard-content {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .landing-title {
+      font-size: 2rem;
+    }
   }
 </style>

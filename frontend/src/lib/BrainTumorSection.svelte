@@ -136,7 +136,7 @@
     //   return;
     // }
 
-    console.log(`Saving data: Image='${imageFile.name}', Prediction='${finalPrediction}', Correct=${isCorrect}`);
+    console.log(`Saving data: Image='${imageFile?.name || 'unknown'}', Prediction='${finalPrediction}', Correct=${isCorrect}`);
     // TODO: Implement actual API call to backend to save imageFile and finalPrediction
     // Example: dispatch('savePrediction', { imageFile, prediction: finalPrediction });
     alert(`Data for '${finalPrediction}' would be saved to the DB, thank you for your feedback.`);
@@ -153,14 +153,22 @@
 </script>
 
 <div class="brain-tumor-classifier">
-  <p class="description">
-    Upload a brain MRI scan. The AI model will predict the tumor type (or lack thereof).
-    Please confirm or correct the prediction to help improve the model.
-  </p>
+  {#if !currentPrediction}
+    <div class="uploader-wrapper">
+      <div class="uploader-container">
+        <ImageUploader onUpload={handleUpload} />
+      </div>
+    </div>
+  {:else}
+    <p class="description">
+      Upload a brain MRI scan. The AI model will predict the tumor type (or lack thereof).
+      Please confirm or correct the prediction to help improve the model.
+    </p>
 
-  <div class="uploader-container">
-    <ImageUploader onUpload={handleUpload} />
-  </div>
+    <div class="uploader-container">
+      <ImageUploader onUpload={handleUpload} />
+    </div>
+  {/if}
 
   {#if currentPrediction}
     <div class="results-container">
@@ -209,61 +217,74 @@
 
 <style>
   .brain-tumor-classifier {
-    background: rgba(251, 249, 249, 0); /* Fully transparent */
-    border-radius: 12px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-    padding: 2rem 1.5rem;
+    background: #ffffff;
+    padding: 3rem;
+    margin: 3rem 0;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
   }
+
   .description {
-      margin-bottom: 1.5rem;
-      color: #546E7A;
-      text-align: center;
-      font-size: 1rem;
+    margin-bottom: 2rem;
+    color: #666;
+    text-align: left;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    font-weight: 400;
   }
+
+  .uploader-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 400px);
+    padding: 0;
+  }
+
   .uploader-container {
-      margin-bottom: 2rem;
-      padding: 1rem;
-      background-color: rgba(236, 239, 241, 0.15); /* Light grey with 25% opacity */
-      border-radius: 8px;
+    margin-bottom: 0;
+    padding: 0;
+    width: 100%;
   }
+
   .results-container {
-      margin-top: 1.5rem;
-      border: 1px solid #0fa0de;
-      border-radius: 8px;
-      padding: 1.5rem;
-      background: rgba(255,255,255,0.18); /* White with 18% opacity */
+    margin-top: 2rem;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 2rem;
+    background: #ffffff;
   }
 
   .confirmation-area {
-      margin-top: 1.5rem;
-      padding-top: 1.5rem;
-      border-top: 1px dashed #B0BEC5;
-      transition: background-color 0.3s ease;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e5e5;
+    transition: all 0.2s ease;
   }
 
   .confirmation-area.confirmed {
-      background-color: #E8F5E9; /* Light green when confirmed */
-      padding: 1rem;
-      border-radius: 6px;
-      text-align: center;
+    background-color: #fafafa;
+    padding: 1.5rem;
+    text-align: center;
   }
 
   .confirmation-choices {
     border: none;
-    padding: 0 0 1rem 0;
-    margin: 0 0 1rem 0;
+    padding: 0;
+    margin: 0 0 1.5rem 0;
     display: flex;
-    justify-content: center;
-    gap: 2rem; /* More space between radio buttons */
+    justify-content: flex-start;
+    gap: 2rem;
     align-items: center;
   }
 
   .confirmation-choices legend {
-    font-weight: bold;
-    margin-bottom: 0.8rem;
-    text-align: center;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    text-align: left;
     width: 100%;
-    color: #37474F;
+    color: #1a1a1a;
+    font-size: 0.9375rem;
   }
 
   .confirmation-choices label {
@@ -271,68 +292,99 @@
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.9375rem;
+    color: #1a1a1a;
+    font-weight: 400;
   }
 
   .confirmation-choices input[type="radio"] {
-      accent-color: #007AFF; /* Style radio button color */
-      cursor: pointer;
-      width: 1.2em;
-      height: 1.2em;
+    accent-color: #000000;
+    cursor: pointer;
+    width: 1em;
+    height: 1em;
   }
 
   .manual-correction {
-    margin-top: 1rem;
-    padding: 1rem;
-    background-color: #FFF9C4; /* Light yellow background */
-    border: 1px solid #FFF176;
-    border-radius: 6px;
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background-color: #fafafa;
+    border: 1px solid #e5e5e5;
     display: flex;
-    flex-direction: column; /* Stack elements vertically */
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 1rem;
   }
 
   .manual-correction label {
-    font-weight: bold;
-    color: #5f6368;
+    font-weight: 500;
+    color: #1a1a1a;
+    font-size: 0.9375rem;
   }
 
   .manual-correction select {
-    padding: 0.6rem;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    min-width: 200px;
+    padding: 0.75rem;
+    border-radius: 0;
+    border: 1px solid #e5e5e5;
+    min-width: 250px;
+    font-family: inherit;
+    font-size: 0.9375rem;
+    background-color: #ffffff;
+  }
+
+  .manual-correction select:focus {
+    outline: none;
+    border-color: #1a1a1a;
   }
 
   .manual-correction button {
-    padding: 0.7rem 1.2rem;
-    font-size: 0.9rem;
+    padding: 0.875rem 2rem;
+    font-size: 0.9375rem;
     cursor: pointer;
-    border-radius: 4px;
-    background-color: #fb8c00; /* Orange button */
-    color: white;
-    border: none;
-    transition: background-color 0.2s ease;
+    border-radius: 0;
+    background-color: #000000;
+    color: #ffffff;
+    border: 1px solid #000000;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    font-weight: 400;
   }
 
   .manual-correction button:hover {
-     background-color: #e65100;
+    background-color: #ffffff;
+    color: #000000;
   }
 
   .manual-correction button:disabled {
-     background-color: #bdbdbd;
-     cursor: not-allowed;
+    background-color: #f5f5f5;
+    color: #999;
+    border-color: #e5e5e5;
+    cursor: not-allowed;
   }
 
   .confirmation-message.positive {
-    font-weight: bold;
-    color: #1B5E20; /* Darker green */
+    font-weight: 400;
+    color: #1a1a1a;
+    font-size: 0.9375rem;
   }
 
-  /* Ensure PredictionResult styles don't conflict massively */
   :global(.results-container .result-container) {
-    padding-bottom: 0; /* Remove default padding if needed */
+    padding-bottom: 0;
   }
 
+  @media (max-width: 768px) {
+    .confirmation-choices {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .manual-correction select {
+      min-width: 100%;
+      width: 100%;
+    }
+
+    .manual-correction button {
+      width: 100%;
+    }
+  }
 </style> 

@@ -43,52 +43,53 @@
 
 <style>
   .result-container {
-    text-align: center;
-    padding: 1rem 0;
+    text-align: left;
+    padding: 0;
   }
 
   .loading-gif {
-    width: 100px;
+    width: 200px;
     height: auto;
     margin: 1rem auto;
+    display: block;
   }
 
   .message {
-    font-size: 1.1rem;
-    padding: 0.8rem;
-    border-radius: 4px;
+    font-size: 1rem;
+    padding: 0;
+    border-radius: 0;
+    font-weight: 400;
+    display: inline-block;
   }
 
   .info {
-    color: #555;
-    background-color: #f0f0f0;
-    border: 1px solid #ddd;
+    color: #666;
+    background-color: transparent;
+    border: none;
   }
 
   .success {
-    /* Base success styles */
-    color: #155724;
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-    font-weight: bold;
-    
-    /* Badge/Pill Overrides */
-    display: inline-block; /* Allow padding and border-radius */
-    padding: 0.4rem 0.8rem;
-    font-size: 1rem; /* Adjust size */
-    border-radius: 16px; /* Pill shape */
+    color: #1a1a1a;
+    background-color: transparent;
+    border: none;
+    font-weight: 500;
+    display: inline-block;
+    padding: 0;
+    font-size: 1rem;
   }
 
   .error {
-    color: #721c24;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    font-weight: bold;
+    color: #1a1a1a;
+    background-color: #fafafa;
+    border: 1px solid #e5e5e5;
+    font-weight: 400;
+    padding: 1rem;
+    display: inline-block;
   }
 
-  .highlighted .message.success { 
-    border-color: #007bff;
-    border-width: 2px;
-    box-shadow: 0 0 5px rgba(0, 122, 255, 0.5); /* Add glow effect when highlighted */
+  .highlighted .message.success {
+    border: none;
+    border-width: 0;
+    box-shadow: none;
   }
 </style> 

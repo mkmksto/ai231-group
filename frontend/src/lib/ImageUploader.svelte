@@ -113,58 +113,75 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
-    padding: 2rem;
-    border: 2px dashed #ccc;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    background: rgba(255,255,255,0.18); /* White with 18% opacity */
+    gap: 1.5rem;
+    padding: 3rem 2rem;
+    border: 1px dashed #e5e5e5;
+    border-radius: 15px;
+    transition: all 0.2s ease;
+    background: #ffffff;
   }
 
   .dragging {
-    border-color: #007bff;
-    background-color: rgba(0, 123, 255, 0.1);
+    border-color: #1a1a1a;
+    background-color: #fafafa;
   }
 
   .file-label {
     display: inline-block;
-    padding: 0.8rem 1.5rem;
-    background-color: #1877f2; /* Facebook blue */
-    color: white;
-    border: none;
-    border-radius: 5px;
+    padding: 0.875rem 2rem;
+    background-color: #000000;
+    color: #ffffff;
+    border: 1px solid #000000;
+    border-radius: 15px;
     cursor: pointer;
     font-size: 1rem;
-    transition: background-color 0.3s ease;
+    font-weight: 400;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    letter-spacing: -0.01em;
   }
 
   .file-label:hover {
-    background-color: #145db2; /* Slightly darker Facebook blue */
+    background-color: #ffffff;
+    color: #000000;
   }
 
-  /* Hide the actual file input */
-  /* input[type="file"] is hidden using the 'hidden' attribute */
-
   .preview {
-    margin-top: 1rem;
+    margin-top: 0;
     text-align: center;
+    width: 100%;
+  }
+
+  .preview p {
+    margin-bottom: 1rem;
+    color: #666;
+    font-size: 0.9375rem;
   }
 
   .preview img {
     max-width: 100%;
-    max-height: 200px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    max-height: 300px;
+    border: 1px solid #e5e5e5;
+    border-radius: 15px;
     margin-top: 0.5rem;
   }
 
   p {
     color: #666;
+    font-size: 0.9375rem;
+    margin: 0;
   }
 
   .drag-hint {
     color: #999;
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    margin-top: 0;
+    font-weight: 400;
+  }
+
+  @media (max-width: 768px) {
+    .uploader-container {
+      padding: 2rem 1rem;
+    }
   }
 </style> 
